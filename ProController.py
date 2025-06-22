@@ -14,58 +14,57 @@ import re
 from game_controller import XboxController
 from misc import Indicator, Event, RunAsync
 
-# from aioconsole import ainput
+from aioconsole import ainput
 
-# from joycontrol import logging_default as log, utils
-# from joycontrol.command_line_interface import ControllerCLI
-# from joycontrol.controller import Controller
-# from joycontrol.controller_state import ControllerState, button_push, button_press, button_release
-# from joycontrol.memory import FlashMemory
-# from joycontrol.protocol import controller_protocol_factory
-# from joycontrol.server import create_hid_server
+from joycontrol import logging_default as log, utils
+from joycontrol.command_line_interface import ControllerCLI
+from joycontrol.controller import Controller
+from joycontrol.controller_state import ControllerState, button_push, button_press, button_release
+from joycontrol.memory import FlashMemory
+from joycontrol.protocol import controller_protocol_factory
+from joycontrol.server import create_hid_server
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-
-
-
 async def press_btn(controller_state,btn,duration=0.1):
-    ...
-    # controller_state.button_state.set_button(btn, True)
-    # await controller_state.send()
-    # await asyncio.sleep(duration)
-    # controller_state.button_state.set_button(btn, False)
-    # await controller_state.send()
+    controller_state.button_state.set_button(btn, True)
+    await controller_state.send()
+    await asyncio.sleep(duration)
+    controller_state.button_state.set_button(btn, False)
+    await controller_state.send()
 async def move_stick(controller_state,stick="l",direction="x",scale=1):
-    ...
-    # scale=min((scale+1)/2*(0x1000),0x1000-1)
-    # a=None
-    # match stick.lower()[0]:
-    #     case "l":
-    #         a=controller_state.l_stick_state
-    #     case "r":
-    #         a=controller_state.r_stick_state
-    # match direction.lower()[0]:
-    #     case "x":
-    #         a.set_h(scale)
-    #     case "y":
-    #         a.set_v(scale)
+    scale=min((scale+1)/2*(0x1000),0x1000-1)
+    a=None
+    match stick.lower()[0]:
+        case "l":
+            a=controller_state.l_stick_state
+        case "r":
+            a=controller_state.r_stick_state
+    match direction.lower()[0]:
+        case "x":
+            a.set_h(scale)
+        case "y":
+            a.set_v(scale)
 
 async def ConnectToController(address:str=None):
-    ...
-    # with utils.get_output(default=None) as capture_file:
-    #     factory = controller_protocol_factory(controller,spi_flash=spi_flash)
-    #     ctl_psm, itr_psm = 17, 19
-    #     transport, protocol = await create_hid_server(factory,
-    #                                                   reconnect_bt_addr=address,
-    #                                                   ctl_psm=ctl_psm,
-    #                                                   itr_psm=itr_psm)
-    #     controller_state = protocol.get_controller_state()
-    #     return controller_state, transport
-    #     await controller_state.connect()
-    #     await transport.close()
+    with utils.get_output(default=None) as capture_file:
+        factory = controller_protocol_factory(controller,spi_flash=spi_flash)
+        ctl_psm, itr_psm = 17, 19
+        transport, protocol = await create_hid_server(factory,
+                                                      reconnect_bt_addr=address,
+                                                      ctl_psm=ctl_psm,
+                                                      itr_psm=itr_psm)
+        controller_state = protocol.get_controller_state()
+        return controller_state, transport
+        await controller_state.connect()
+        await transport.close()
+def list_switches():
+    raw_addrs=subprocess.getoutput("bluetoothctl devices")
+    addrs=raw_addrs.split("\n")
+    addrs=[re.findall(r"(((([0-9A-Z]{2}):){5})[0-9A-Z][0-9A-Z])",x)[0][0] for x in addrs if x.lower().__contains__("nintendo")]
+    return addrs
 
 class ConnectionType(Enum):
     PAIRED = "paired"
@@ -103,7 +102,7 @@ class GUI(QMainWindow):
         self.list_of_switches.setGeometry(20, 80, 200, 300)
         self.list_of_switches.setSelectionMode(QAbstractItemView.SingleSelection)
         self.list_of_switches.setStyleSheet("font-size: 16px;")
-        self.switch_addresses=["E4:17:D8:12:34:56"]  # Placeholder for switch addresses
+        self.switch_addresses=[]  # Placeholder for switch addresses
         for address in self.switch_addresses:
             item = QListWidgetItem(address)
             item.setData(Qt.UserRole, address)
@@ -149,6 +148,7 @@ class GUI(QMainWindow):
         self.reconnect_action.setEnabled(True)
         self.remove_action.setEnabled(True)
     def update_switch_list(self):
+        self.update_connection_menu()
         # Here you would normally fetch the list of connected switches
         raw_addrs=subprocess.getoutput("bluetoothctl devices")
         addrs=raw_addrs.split("\n")
@@ -171,7 +171,7 @@ class GUI(QMainWindow):
         match self.current_connection[0]:
             case ConnectionStatus.CONNECTED:
                 self.disconnect_action.setEnabled(True)
-                self.reconnect_action.setEnabled(True)
+                self.reconnect_action.setEnabled(False)
                 self.pair_action.setEnabled(False)
                 self.remove_action.setEnabled(True)
             case ConnectionStatus.DISCONNECTED:
