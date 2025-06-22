@@ -50,6 +50,8 @@ async def move_stick(controller_state,stick="l",direction="x",scale=1):
 
 async def ConnectToController(address:str=None):
     with utils.get_output(default=None) as capture_file:
+        controller = Controller.PRO_CONTROLLER
+        spi_flash = FlashMemory()
         factory = controller_protocol_factory(controller,spi_flash=spi_flash)
         ctl_psm, itr_psm = 17, 19
         transport, protocol = await create_hid_server(factory,
@@ -57,9 +59,9 @@ async def ConnectToController(address:str=None):
                                                       ctl_psm=ctl_psm,
                                                       itr_psm=itr_psm)
         controller_state = protocol.get_controller_state()
-        return controller_state, transport
         await controller_state.connect()
-        await transport.close()
+        return controller_state, transport
+        # await transport.close()
 def list_switches():
     raw_addrs=subprocess.getoutput("bluetoothctl devices")
     addrs=raw_addrs.split("\n")
