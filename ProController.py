@@ -224,6 +224,7 @@ class GUI(QMainWindow):
         self.async_var={}
         self.async_send={}
         self.async_thread=threading.Thread(target=asyncio.run, args=(main(),), daemon=True)
+        self.async_thread.start()  # Start the async thread
         
         self.XboxController = InputHandler(self.controller_state)  # Initialize Xbox controller
 
