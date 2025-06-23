@@ -212,6 +212,12 @@ class GUI(QMainWindow):
                 self.connection_indicator.set_color("red")
                 self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
                 return
+            if self.controller_state is None or self.transport is None:
+                logging.error("Controller state or transport is None after pairing.")
+                self.connection_indicator.setText("Pairing Failed")
+                self.connection_indicator.set_color("red")
+                self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
+                return
             print(f"Pairing successful. {self.current_connection}")
         pair_event.connect(pairing)
         pair_event.trigger()
