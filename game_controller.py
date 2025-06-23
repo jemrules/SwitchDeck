@@ -3,26 +3,57 @@ import math
 import time
 import threading
 
-class XboxController(object):
+class SteamDeckController(object):
     MAX_TRIG_VAL = math.pow(2, 8)
     MAX_JOY_VAL = math.pow(2, 15)
 
     def __init__(self):
         self.DIGITAL = {
-            'LeftBumper' : 0,
+            'A'         : 0,
+            'B'         : 0,
+            'X'         : 0,
+            'Y'         : 0,
+            'LeftBumper': 0,
             'RightBumper': 0,
-            'A'          : 0,
-            'B'          : 0,
-            'X'          : 0,
-            'Y'          : 0,
-            'LeftThumb'  : 0,
-            'RightThumb' : 0,
-            'Back'       : 0,
-            'Start'      : 0,
-            'LeftDPad'   : 0,
-            'RightDPad'  : 0,
-            'UpDPad'     : 0,
-            'DownDPad'   : 0
+            'LeftTrigger': 0,
+            'RightTrigger': 0,
+            'Back'      : 0,
+            'Start'     : 0,
+            'LeftThumb' : 0,
+            'RightThumb': 0,
+            'UpDPad'    : 0,
+            'DownDPad'  : 0,
+            'LeftDPad'  : 0,
+            'RightDPad' : 0,
+            'Steam'     : 0,
+            'QuickAccess': 0,
+            'L4'        : 0,
+            'L5'        : 0,
+            'R4'        : 0,
+            'R5'        : 0
+        }
+        self.DIGITAL_KEYS = {
+            "Button 0" : "A",
+            "Button 1" : "B",
+            "Button 2" : "Y",
+            "Button 3" : "X",
+            "Button 4" : "",
+            "Button 5" : "",
+            "Button 6" : "",
+            "Button 7" : "",
+            "Button 8" : "",
+            "Button 9" : "",
+            "Button 10": "",
+            "Button 11": "",
+            "Button 12": "",
+            "Button 13": "",
+            "Button 14": "",
+            "Button 15": "",
+            "Button 16": "",
+            "Button 17": "",
+            "Button 18": "",
+            "Button 19": "",
+            "Button 20": ""
         }
         self.ANALOG = {
             'LeftJoystickX' : 0,
@@ -32,27 +63,14 @@ class XboxController(object):
             'LeftTrigger'   : 0,
             'RightTrigger'  : 0
         }
-        self.LeftJoystickY  = 0
-        self.LeftJoystickX  = 0
-        self.RightJoystickY = 0
-        self.RightJoystickX = 0
-        self.LeftTrigger    = 0
-        self.RightTrigger   = 0
-        self.LeftBumper     = 0
-        self.RightBumper    = 0
-        self.A              = 0
-        self.X              = 0
-        self.Y              = 0
-        self.B              = 0
-        self.LeftThumb      = 0
-        self.RightThumb     = 0
-        self.Back           = 0
-        self.Start          = 0
-        self.LeftDPad       = 0
-        self.RightDPad      = 0
-        self.UpDPad         = 0
-        self.DownDPad       = 0
-
+        self.ANALOG_KEYS = {
+            "Axis 0" : "",
+            "-Axis 0" : "",
+            "Axis 1" : "",
+            "-Axis 1" : "",
+            "Axis 2" : "",
+            "Axis 3" : ""
+        }
         self._monitor_thread = threading.Thread(target=run_event_loop, args=(self.added_joystick, self.removed_joystick, self.key_received))
         self._monitor_thread.daemon = True
         self._monitor_thread.start()
@@ -70,16 +88,12 @@ class XboxController(object):
     def removed_joystick(self, joystick: Joystick):
         print(f"Removed {joystick}")
     def key_received(self, key: Key):
-        print(f"Key received: {key.value} ({key.keyname})")
-        match key.keyname:
-            case "Button 0":
-                self.A = key.value
-            case "Button 1":
-                self.B = key.value
-            case "Button 2":
-                self.X = key.value
-            case "Button 3":
-                self.Y = key.value
+        if not key.keyname.lower().__contains__("axis"):
+            print(f"Key received: {key.value} ({key.keyname})")
+        for key_name, key_value in self.DIGITAL_KEYS.items():
+            if key.keyname.lower() == key_name.lower():
+                self.DIGITAL[key_name] = key.value
+                break
         self.update()
     def update(self, function=None):
         # Update the ANALOG dictionary
@@ -112,7 +126,7 @@ class XboxController(object):
             function(self.DIGITAL, self.ANALOG)
 
 if __name__ == "__main__":
-    controller = XboxController()
+    controller = SteamDeckController()
     while True:
         # Add a small delay to avoid flooding the output
         time.sleep(0.1)  # Adjust the sleep time as needed

@@ -11,7 +11,7 @@ import sys
 import os
 import re
 
-from game_controller import XboxController
+from game_controller import SteamDeckController
 from misc import Indicator, Event, RunAsync, RunThreadedAsync
 
 from aioconsole import ainput
@@ -29,6 +29,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 async def press_btn(controller_state,btn,duration=0.1):
+    # Available buttons: {'y','x','b','a','r','zr','minus','plus','r_stick','l_stick','home','capture','down','up','right','left','l','zl'}
     controller_state.button_state.set_button(btn, True)
     await controller_state.send()
     await asyncio.sleep(duration)
@@ -72,20 +73,40 @@ def list_switches():
     addrs=[re.findall(r"(((([0-9A-Z]{2}):){5})[0-9A-Z][0-9A-Z])",x)[0][0] for x in addrs if x.lower().__contains__("nintendo")]
     return addrs
 
-class InputHandler(XboxController):
+class InputHandler(SteamDeckController):
     def __init__(self, controller_state):
         super().__init__()
         self.controller_state = controller_state
         self.running = True
+        self.JOYCON_DIGITAL_KEYS = {
+            "LeftTrigger": "zl",
+            "RightTrigger": "zr",
+            "LeftBumper": "l",
+            "RightBumper": "r",
+            "A": "a",
+            "B": "b",
+            "X": "x",
+            "Y": "y",
+            "LeftThumb": "l_stick",
+            "RightThumb": "r_stick",
+            "Back": "minus",
+            "Start": "plus",
+            "LeftDPad": "left",
+            "RightDPad": "right",
+            "UpDPad": "up",
+            "DownDPad": "down"
+        }
         self.input_thread = threading.Thread(target=self.handle_input, args=(self.DIGITAL, self.ANALOG))
         self.input_thread.start()
     
     def handle_input(self,digital: dict,analog: dict): #* This method is called after every input loop in super _monitor_controller
         if not self.running:
             return
-        if self.A:
-            print("A button pressed")
-
+        for key, value in self.JOYCON_DIGITAL_KEYS.items():
+            if digital[key]>0.5:
+                button_push(self.controller_state, value)
+            else:
+                button_release(self.controller_state, value)
 class ConnectionType(Enum):
     PAIRED = "paired"
     UNPAIRED = "unpaired"
