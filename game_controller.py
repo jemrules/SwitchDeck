@@ -67,7 +67,7 @@ class XboxController(object):
         return [x, y, a, b, rb]
 
 
-    def _monitor_controller(self):
+    def _monitor_controller(self,function=None):
         while True:
             events = get_gamepad()
             for event in events:
@@ -137,3 +137,5 @@ class XboxController(object):
                 'UpDPad': self.UpDPad,
                 'DownDPad': self.DownDPad
             }
+            if function:
+                function()

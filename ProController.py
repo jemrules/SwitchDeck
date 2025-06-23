@@ -72,6 +72,44 @@ def list_switches():
     addrs=[re.findall(r"(((([0-9A-Z]{2}):){5})[0-9A-Z][0-9A-Z])",x)[0][0] for x in addrs if x.lower().__contains__("nintendo")]
     return addrs
 
+async def press_btn(controller_state,btn,duration=0.1):
+    print("set button down")
+    controller_state.button_state.set_button(btn, True)
+    await controller_state.send()
+    await asyncio.sleep(duration)
+    controller_state.button_state.set_button(btn, False)
+    await controller_state.send()
+async def move_stick(controller_state,stick="l",direction="x",scale=1):
+    scale=min((scale+1)/2*(0x1000),0x1000-1)
+    a=None
+    match stick.lower()[0]:
+        case "l":
+            a=controller_state.l_stick_state
+        case "r":
+            a=controller_state.r_stick_state
+    match direction.lower()[0]:
+        case "x":
+            a.set_h(scale)
+        case "y":
+            a.set_v(scale)
+
+class InputHandler(XboxController):
+    def __init__(self, controller_state):
+        super().__init__()
+        self.controller_state = controller_state
+        self.running = True
+        self.input_thread = threading.Thread(target=self.handle_input)
+        self.input_thread.start()
+
+    def _monitor_controller(self,function=None):
+        super()._monitor_controller(self.handle_input)
+    
+    def handle_input(self,digital: dict,analog: dict): #* This method is called after every input loop in super _monitor_controller
+        if not self.running:
+            return
+        if self.A:
+            print("A button pressed")
+
 class ConnectionType(Enum):
     PAIRED = "paired"
     UNPAIRED = "unpaired"
@@ -147,6 +185,8 @@ class GUI(QMainWindow):
         self.SWITCH_ADDRESS = "00:00:00:00:00:00"  # Placeholder for switch address
         self.controller_state = None  # Placeholder for controller state
         self.transport = None  # Placeholder for transport object
+        
+        self.XboxController = XboxController()  # Initialize Xbox controller
 
         from typing import Tuple
         self.current_connection: Tuple[ConnectionStatus, ConnectionType] = (ConnectionStatus.DISCONNECTED, ConnectionType.UNPAIRED)  # Placeholder for current connection object
