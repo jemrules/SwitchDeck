@@ -210,6 +210,9 @@ class GUI(QMainWindow):
                 self.disconnect_action.setEnabled(False)
                 self.reconnect_action.setEnabled(False)
                 self.pair_action.setEnabled(False)
+        if self.list_of_switches.currentItem() is not None:
+            self.reconnect_action.setEnabled(True)
+            self.remove_action.setEnabled(True)
     def pair_switch(self):
         self.connection_indicator.setText("Pairing...")
         self.connection_indicator.set_color("yellow")
