@@ -181,7 +181,6 @@ class GUI(QMainWindow):
                 self.disconnect_action.setEnabled(True)
                 self.reconnect_action.setEnabled(False)
                 self.pair_action.setEnabled(False)
-                self.remove_action.setEnabled(True)
             case ConnectionStatus.DISCONNECTED:
                 self.disconnect_action.setEnabled(False)
                 self.reconnect_action.setEnabled(False)
@@ -191,12 +190,10 @@ class GUI(QMainWindow):
                 self.disconnect_action.setEnabled(False)
                 self.reconnect_action.setEnabled(False)
                 self.pair_action.setEnabled(False)
-                self.remove_action.setEnabled(False)
             case ConnectionStatus.PAIRING:
                 self.disconnect_action.setEnabled(False)
                 self.reconnect_action.setEnabled(False)
                 self.pair_action.setEnabled(False)
-                self.remove_action.setEnabled(False)
     def pair_switch(self):
         self.connection_indicator.setText("Pairing...")
         self.connection_indicator.set_color("yellow")
