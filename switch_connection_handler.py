@@ -55,12 +55,14 @@ class SwitchConnectionHandler:
         self.event_queue.put_nowait((EventType.DISCONNECT_DEVICE, []))
     
     def button_press(self, button_name):
+        print(f"Pressing button: {button_name}")
         try:
             self.controller_state.button_state.set_button(button_name, True)
             self.send_input = True
         except:
             print(f"Button {button_name} not found in controller state")
     def button_release(self, button_name):
+        print(f"Releasing button: {button_name}")
         try:
             self.controller_state.button_state.set_button(button_name, False)
             self.send_input = True
