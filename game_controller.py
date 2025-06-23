@@ -86,10 +86,10 @@ class SteamDeckController(object):
     def removed_joystick(self, joystick: Joystick):
         print(f"Removed {joystick}")
     def key_received(self, key: Key):
-        if not key.keyname.lower().__contains__("axis"):
-            print(f"Key received: {key.value} ({key.keyname})")
-        elif abs(key.value) >0.07:
-            print(f"Key received: {key.value} ({key.keyname}) - Ignored due to low value")
+        # if not key.keyname.lower().__contains__("axis"):
+        #     print(f"Key received: {key.value} ({key.keyname})")
+        # elif abs(key.value) >0.07:
+        #     print(f"Key received: {key.value} ({key.keyname}) - Ignored due to low value")
         if key.keyname.lower().__contains__("button"):
             for key_name, key_value in self.DIGITAL_KEYS.items():
                 if key.keyname.lower() == key_name.lower():
