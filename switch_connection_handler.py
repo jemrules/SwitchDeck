@@ -1,5 +1,6 @@
 import asyncio
 import threading
+from time import sleep
 from enum import Enum
 
 from aioconsole import ainput
@@ -83,7 +84,11 @@ class test:
         if not self.controller_state or not self.transport:
             print("Failed to connect to device")
             return
-        await self.controller_state.connect()
+        try:
+            await self.controller_state.connect()
+        except Exception as e:
+            print(f"Error connecting to controller: {e}")
+            return
         print(f"Connected to device at {address}")
         self.event_queue.task_done()
     async def run(self):
@@ -109,6 +114,8 @@ if __name__ == "__main__":
     print("Finished")
     t = test()
     t.event_connect_device("60:6B:FF:9B:65:C9")
+    sleep(1)
+    t.button_press("home")
     while True:
         ...
 
