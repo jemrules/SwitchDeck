@@ -185,7 +185,6 @@ class GUI(QMainWindow):
                 self.disconnect_action.setEnabled(False)
                 self.reconnect_action.setEnabled(False)
                 self.pair_action.setEnabled(True)
-                self.remove_action.setEnabled(False)
             case ConnectionStatus.RECONNECTING:
                 self.disconnect_action.setEnabled(False)
                 self.reconnect_action.setEnabled(False)
