@@ -57,7 +57,7 @@ class test:
             self.send_input = True
         else:
             print("Controller is not connected")
-    def move_stick(self,stick="l",direction="x",scale=1):
+    def move_stick(self,stick="l",direction="x",scale: float=1):
         if not self.controller_state:
             print("Controller is not connected")
             return
