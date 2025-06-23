@@ -149,6 +149,8 @@ async def main():
             continue
         try:
             await GLOBAL_controller_state.send()
+        except Exception as e:
+            logging.error(f"Error sending controller state: {e}")
 
 class GUI(QMainWindow):
     def __init__(self):
