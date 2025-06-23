@@ -37,8 +37,11 @@ async def press_btn(controller_state,btn,duration=0.1):
     await controller_state.send()
 def button_push(controller_state, btn):
     async def push():
+        print(f"Pushing button: {btn}")
         controller_state.button_state.set_button(btn, True)
+        print(f"Button {btn} pushed.")
         await controller_state.send()
+        print("Controller state sent.")
     asyncio.run(push())
 def button_release(controller_state, btn):
     async def release():
