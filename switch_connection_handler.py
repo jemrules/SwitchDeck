@@ -16,7 +16,14 @@ class EventType(Enum):
     CONNECT_DEVICE = "connect_device"
     DISCONNECT_DEVICE = "disconnect_device"
 
-class test:
+class ConnectionStatus(Enum):
+    CONNECTED = "connected"
+    DISCONNECTED = "disconnected"
+    RECONNECTING = "reconnecting"
+    PAIRING = "pairing"
+    ERROR = "error"
+
+class SwitchConnectionHandler:
     def __init__(self):
         def thread_function():
             try:
@@ -26,6 +33,7 @@ class test:
             except Exception as e:
                 print(f"Exception: {e}")
             print("Thread function completed")
+        self.status=ConnectionStatus.DISCONNECTED
         self.init_variables()
         self.event_queue = asyncio.Queue() #type (EventType, args:list[any])
         self.send_input = False
@@ -100,9 +108,15 @@ class test:
                     print(f"Event: {event_type.value}, Args: {args}")
                     address = args[0] if args else None
                     try:
-                        await self.connect_device(address)
+                        await asyncio.wait_for(self.connect_device(address), timeout=20)
                     finally:
                         self.event_queue.task_done()
+                    if self.controller_state and self.transport:
+                        self.status = ConnectionStatus.CONNECTED
+                        print(f"Controller connected: {self.controller_state}")
+                    else:
+                        self.status = ConnectionStatus.ERROR
+                        print("Failed to connect controller")
                 case EventType.DISCONNECT_DEVICE:
                     print(f"Event: {event_type.value}, Args: {args}")
                     if self.controller_state:
@@ -121,7 +135,7 @@ class test:
 
 if __name__ == "__main__":
     print("Finished")
-    t = test()
+    t = SwitchConnectionHandler()
     t.event_connect_device("60:6B:FF:9B:65:C9")
     sleep(7)
     t.button_press("home")

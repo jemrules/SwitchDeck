@@ -13,6 +13,7 @@ import re
 
 from game_controller import SteamDeckController
 from misc import Indicator, Event, RunAsync, RunThreadedAsync
+from switch_connection_handler import ConnectionStatus, SwitchConnectionHandler
 
 from aioconsole import ainput
 
@@ -35,53 +36,53 @@ async def press_btn(controller_state,btn,duration=0.1):
     await asyncio.sleep(duration)
     controller_state.button_state.set_button(btn, False)
     await controller_state.send()
-async def btnpush(btn,controller_state):
-    print(f"Pushing button: {btn}")
-    controller_state.button_state.set_button(btn, True)
-    print(f"Button {btn} pushed.")
-def button_push(controller_state, btn):
-    asyncio.run(btnpush(btn, controller_state))
-async def btnrelease(btn,controller_state):
-    print(f"Releasing button: {btn}")
-    controller_state.button_state.set_button(btn, False)
-    print(f"Button {btn} released.")
-def button_release(controller_state, btn):
-    asyncio.run(btnrelease(btn, controller_state))
-async def move_stick(controller_state,stick="l",direction="x",scale=1):
-    scale=min((scale+1)/2*(0x1000),0x1000-1)
-    a=None
-    match stick.lower()[0]:
-        case "l":
-            a=controller_state.l_stick_state
-        case "r":
-            a=controller_state.r_stick_state
-    match direction.lower()[0]:
-        case "x":
-            a.set_h(scale)
-        case "y":
-            a.set_v(scale)
+# async def btnpush(btn,controller_state):
+#     print(f"Pushing button: {btn}")
+#     controller_state.button_state.set_button(btn, True)
+#     print(f"Button {btn} pushed.")
+# def button_push(controller_state, btn):
+#     asyncio.run(btnpush(btn, controller_state))
+# async def btnrelease(btn,controller_state):
+#     print(f"Releasing button: {btn}")
+#     controller_state.button_state.set_button(btn, False)
+#     print(f"Button {btn} released.")
+# def button_release(controller_state, btn):
+#     asyncio.run(btnrelease(btn, controller_state))
+# async def move_stick(controller_state,stick="l",direction="x",scale=1):
+#     scale=min((scale+1)/2*(0x1000),0x1000-1)
+#     a=None
+#     match stick.lower()[0]:
+#         case "l":
+#             a=controller_state.l_stick_state
+#         case "r":
+#             a=controller_state.r_stick_state
+#     match direction.lower()[0]:
+#         case "x":
+#             a.set_h(scale)
+#         case "y":
+#             a.set_v(scale)
 
-async def ConnectToController(address:str=None,parent=None):
-    global GLOBAL_controller_state, GLOBAL_transport
-    with utils.get_output(default=None) as capture_file:
-        controller = Controller.PRO_CONTROLLER
-        spi_flash = FlashMemory()
-        factory = controller_protocol_factory(controller,spi_flash=spi_flash)
-        ctl_psm, itr_psm = 17, 19
-        transport, protocol = await create_hid_server(factory,
-                                                      reconnect_bt_addr=address,
-                                                      ctl_psm=ctl_psm,
-                                                      itr_psm=itr_psm)
-        controller_state = protocol.get_controller_state()
-        await controller_state.connect()
-        if parent:
-            parent.controller_state = controller_state
-            parent.transport = transport
-        GLOBAL_controller_state = controller_state
-        GLOBAL_transport = transport
-        print(f"transport: {transport}, controller_state: {controller_state}")
-        return controller_state, transport
-        # await transport.close()
+# async def ConnectToController(address:str=None,parent=None):
+#     global GLOBAL_controller_state, GLOBAL_transport
+#     with utils.get_output(default=None) as capture_file:
+#         controller = Controller.PRO_CONTROLLER
+#         spi_flash = FlashMemory()
+#         factory = controller_protocol_factory(controller,spi_flash=spi_flash)
+#         ctl_psm, itr_psm = 17, 19
+#         transport, protocol = await create_hid_server(factory,
+#                                                       reconnect_bt_addr=address,
+#                                                       ctl_psm=ctl_psm,
+#                                                       itr_psm=itr_psm)
+#         controller_state = protocol.get_controller_state()
+#         await controller_state.connect()
+#         if parent:
+#             parent.controller_state = controller_state
+#             parent.transport = transport
+#         GLOBAL_controller_state = controller_state
+#         GLOBAL_transport = transport
+#         print(f"transport: {transport}, controller_state: {controller_state}")
+#         return controller_state, transport
+#         # await transport.close()
 def list_switches():
     raw_addrs=subprocess.getoutput("bluetoothctl devices")
     addrs=raw_addrs.split("\n")
@@ -89,9 +90,9 @@ def list_switches():
     return addrs
 
 class InputHandler(SteamDeckController):
-    def __init__(self, parent):
+    def __init__(self, SwitchHandler: SwitchConnectionHandler):
         super().__init__(self.handle_input)
-        self.parent=parent
+        self.SwitchHandler = SwitchHandler
         self.running = True
         self.JOYCON_DIGITAL_KEYS = {
             "LeftTrigger": "zl",
@@ -119,40 +120,14 @@ class InputHandler(SteamDeckController):
         for key, value in self.JOYCON_DIGITAL_KEYS.items():
             # print(f"Key: {key}, Value: {value}, Digital Value: {digital[key]}")
             if digital[key]>0.5:
-                button_push(GLOBAL_controller_state, value)
-                # print(f"Button pushed: {key} -> {value}")
+                self.SwitchHandler.button_press(value)
             else:
-                button_release(GLOBAL_controller_state, value)
+                self.SwitchHandler.button_release(value)
         print("Done handling input!")
 class ConnectionType(Enum):
     PAIRED = "paired"
     UNPAIRED = "unpaired"
     DIRECT_CONNECT = "direct_connect"
-
-class ConnectionStatus(Enum):
-    CONNECTED = "connected"
-    DISCONNECTED = "disconnected"
-    RECONNECTING = "reconnecting"
-    PAIRING = "pairing"
-    ERROR = "error"
-
-GLOBAL_controller_state = None  # Placeholder for controller state
-GLOBAL_transport = None  # Placeholder for transport object
-
-async def main():
-    global GLOBAL_controller_state, GLOBAL_transport
-    while True:
-        await asyncio.sleep(0.1)  # Adjust the sleep time as needed
-        if GLOBAL_controller_state is None or GLOBAL_transport is None:
-            print("Controller state or transport is None, attempting to connect...")
-            continue
-        try:
-            print("Sending controller state...")
-            await GLOBAL_controller_state.send()
-            print("Controller state sent successfully.")
-            await asyncio.sleep(0.1)  # Adjust the sleep time as needed
-        except Exception as e:
-            logging.error(f"Error sending controller state: {e}")
 
 class GUI(QMainWindow):
     def __init__(self):
@@ -214,19 +189,13 @@ class GUI(QMainWindow):
         self.refresh_timer.timeout.connect(self.update_switch_list)
         self.refresh_timer.start(5000)  # Refresh every 5 seconds
 
-        self.SWITCH_ADDRESS = "00:00:00:00:00:00"  # Placeholder for switch address
-        self.controller_state = None  # Placeholder for controller state
-        self.transport = None  # Placeholder for transport object
+        self.SwitchHandler = SwitchConnectionHandler()  # Initialize the switch connection handler
 
-        self.async_var={}
-        self.async_send={}
-        self.async_thread=threading.Thread(target=asyncio.run, args=(main(),), daemon=True)
-        self.async_thread.start()  # Start the async thread
+        self.SWITCH_ADDRESS = "00:00:00:00:00:00"  # Placeholder for switch address
         
-        self.XboxController = InputHandler(self.controller_state)  # Initialize Xbox controller
+        self.XboxController = InputHandler(self.SwitchHandler.controller_state)  # Initialize Xbox controller
 
         from typing import Tuple
-        self.current_connection: Tuple[ConnectionStatus, ConnectionType] = (ConnectionStatus.DISCONNECTED, ConnectionType.UNPAIRED)  # Placeholder for current connection object
         self.update_switch_list()
     def on_switch_selected(self, item):
         self.reconnect_action.setEnabled(True)
@@ -253,9 +222,9 @@ class GUI(QMainWindow):
     def close(self):
         sys.exit(0)
         return super().close()
-    def update_connection_menu(self): #! Doesn't Trigger
+    def update_connection_menu(self):
         print("Updating connection menu...")
-        match self.current_connection[0]:
+        match self.SwitchHandler.status:
             case ConnectionStatus.CONNECTED:
                 self.disconnect_action.setEnabled(True)
                 self.reconnect_action.setEnabled(False)
@@ -278,69 +247,68 @@ class GUI(QMainWindow):
     def pair_switch(self):
         self.connection_indicator.setText("Pairing...")
         self.connection_indicator.set_color("yellow")
-        self.current_connection = (ConnectionStatus.PAIRING, ConnectionType.PAIRED)
+        self.SwitchHandler.status = (ConnectionStatus.PAIRING)
         # Here you would implement the pairing logic
         def pairing():
             try:
-                MAX_PARING_TIMEOUT = 20  # seconds
-                RunThreadedAsync(ConnectToController, MAX_PARING_TIMEOUT, None, self)
+                
                 self.connection_indicator.setText("Connected!")
                 self.connection_indicator.set_color("green")
-                self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.PAIRED)
+                self.SwitchHandler.status = (ConnectionStatus.CONNECTED)
             except Exception as e:
                 logging.error(f"Pairing failed: {e}")
                 self.connection_indicator.setText("Pairing Failed")
                 self.connection_indicator.set_color("red")
-                self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
+                self.SwitchHandler.status = (ConnectionStatus.ERROR)
                 return
-            if self.controller_state is None or self.transport is None:
-                logging.error(f"Controller state or transport is None after pairing. transport: {self.transport}, controller_state: {self.controller_state}")
+            if self.SwitchHandler.controller_state is None or self.SwitchHandler.transport is None:
+                logging.error(f"Controller state or transport is None after pairing. transport: {self.SwitchHandler.transport}, controller_state: {self.SwitchHandler.controller_state}")
                 self.connection_indicator.setText("Pairing Failed")
                 self.connection_indicator.set_color("red")
-                self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
+                self.SwitchHandler.status = (ConnectionStatus.ERROR)
                 return
-            print(f"Pairing successful. {self.current_connection}")
+            print(f"Pairing successful. {self.SwitchHandler.status}")
         pair_event=Event(self)
         pair_event.connect(pairing)
         pair_event.trigger()
     def disconnect_switch(self):
         # Here you would implement the disconnection logic
-        if self.controller_state:
+        if self.SwitchHandler.controller_state:
             # Assuming controller_state has a disconnect method
             try:
                 loop=asyncio.get_event_loop()
-                loop.run_until_complete(self.controller_state.disconnect())
-                self.transport.close()
+                loop.run_until_complete(self.SwitchHandler.controller_state.disconnect())
+                self.SwitchHandler.transport.close()
             except Exception as e:
                 logging.error(f"Disconnection failed: {e}")
-        self.controller_state, self.transport = None, None
+        self.SwitchHandler.controller_state, self.SwitchHandler.transport = None, None
         self.connection_indicator.setText("Disconnected")
         self.connection_indicator.set_color("red")
-        self.current_connection = (ConnectionStatus.DISCONNECTED, ConnectionType.UNPAIRED)
+        self.SwitchHandler.status = (ConnectionStatus.DISCONNECTED)
         self.reconnect_action.setEnabled(False)
         self.remove_action.setEnabled(False)
     def reconnect_switch(self):
         self.connection_indicator.setText("Reconnecting...")
         self.connection_indicator.set_color("yellow")
-        self.current_connection = (ConnectionStatus.RECONNECTING, ConnectionType.DIRECT_CONNECT)
+        self.SwitchHandler.status = (ConnectionStatus.RECONNECTING)
         self.SWITCH_ADDRESS = self.list_of_switches.currentItem().data(Qt.UserRole) if self.list_of_switches.currentItem() else None
         def reconnecting():
             try:
                 RunAsync(ConnectToController, self.SWITCH_ADDRESS, self)
                 self.connection_indicator.setText("Connected!")
                 self.connection_indicator.set_color("green")
-                self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.PAIRED)
+                self.SwitchHandler.status = (ConnectionStatus.CONNECTED)
             except Exception as e:
                 logging.error(f"Connecting failed: {e}")
                 self.connection_indicator.setText("Connecting Failed")
                 self.connection_indicator.set_color("red")
-                self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
+                self.SwitchHandler.status = (ConnectionStatus.ERROR)
                 return
-            if self.controller_state is None or self.transport is None:
-                logging.error(f"Controller state or transport is None after pairing. transport: {self.transport}, controller_state: {self.controller_state}")
+            if self.SwitchHandler.controller_state is None or self.SwitchHandler.transport is None:
+                logging.error(f"Controller state or transport is None after pairing. transport: {self.SwitchHandler.transport}, controller_state: {self.SwitchHandler.controller_state}")
                 self.connection_indicator.setText("Connecting Failed")
                 self.connection_indicator.set_color("red")
-                self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
+                self.SwitchHandler.status = (ConnectionStatus.ERROR)
                 return
         reconnect_event = Event(self)
         reconnect_event.connect(reconnecting)
