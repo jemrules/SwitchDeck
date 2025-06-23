@@ -120,6 +120,7 @@ class InputHandler(SteamDeckController):
                 print(f"Button pushed: {key} -> {value}")
             else:
                 button_release(GLOBAL_controller_state, value)
+        print("Done handling input!")
 class ConnectionType(Enum):
     PAIRED = "paired"
     UNPAIRED = "unpaired"
