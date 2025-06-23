@@ -1,5 +1,6 @@
-from inputs import get_gamepad
+from pyjoystick.sdl2 import Key, Joystick, run_event_loop
 import math
+import time
 import threading
 
 class XboxController(object):
@@ -8,52 +9,51 @@ class XboxController(object):
 
     def __init__(self):
         self.DIGITAL = {
-            'LeftBumper': 0,
+            'LeftBumper' : 0,
             'RightBumper': 0,
-            'A': 0,
-            'B': 0,
-            'X': 0,
-            'Y': 0,
-            'LeftThumb': 0,
-            'RightThumb': 0,
-            'Back': 0,
-            'Start': 0,
-            'LeftDPad': 0,
-            'RightDPad': 0,
-            'UpDPad': 0,
-            'DownDPad': 0
+            'A'          : 0,
+            'B'          : 0,
+            'X'          : 0,
+            'Y'          : 0,
+            'LeftThumb'  : 0,
+            'RightThumb' : 0,
+            'Back'       : 0,
+            'Start'      : 0,
+            'LeftDPad'   : 0,
+            'RightDPad'  : 0,
+            'UpDPad'     : 0,
+            'DownDPad'   : 0
         }
         self.ANALOG = {
-            'LeftJoystickX': 0,
-            'LeftJoystickY': 0,
+            'LeftJoystickX' : 0,
+            'LeftJoystickY' : 0,
             'RightJoystickX': 0,
             'RightJoystickY': 0,
-            'LeftTrigger': 0,
-            'RightTrigger': 0
+            'LeftTrigger'   : 0,
+            'RightTrigger'  : 0
         }
-        self.ANALOG={}
-        self.LeftJoystickY = 0
-        self.LeftJoystickX = 0
+        self.LeftJoystickY  = 0
+        self.LeftJoystickX  = 0
         self.RightJoystickY = 0
         self.RightJoystickX = 0
-        self.LeftTrigger = 0
-        self.RightTrigger = 0
-        self.LeftBumper = 0
-        self.RightBumper = 0
-        self.A = 0
-        self.X = 0
-        self.Y = 0
-        self.B = 0
-        self.LeftThumb = 0
-        self.RightThumb = 0
-        self.Back = 0
-        self.Start = 0
-        self.LeftDPad = 0
-        self.RightDPad = 0
-        self.UpDPad = 0
-        self.DownDPad = 0
+        self.LeftTrigger    = 0
+        self.RightTrigger   = 0
+        self.LeftBumper     = 0
+        self.RightBumper    = 0
+        self.A              = 0
+        self.X              = 0
+        self.Y              = 0
+        self.B              = 0
+        self.LeftThumb      = 0
+        self.RightThumb     = 0
+        self.Back           = 0
+        self.Start          = 0
+        self.LeftDPad       = 0
+        self.RightDPad      = 0
+        self.UpDPad         = 0
+        self.DownDPad       = 0
 
-        self._monitor_thread = threading.Thread(target=self._monitor_controller, args=())
+        self._monitor_thread = threading.Thread(target=run_event_loop, args=(self.added_joystick, self.removed_joystick, self.key_received))
         self._monitor_thread.daemon = True
         self._monitor_thread.start()
 
@@ -65,87 +65,45 @@ class XboxController(object):
         b = self.X # b=1, x=2
         rb = self.RightBumper
         return [x, y, a, b, rb]
-
-
-    def _monitor_controller(self,function=None):
-        while True:
-            events = get_gamepad()
-            for event in events:
-                if event.code == 'ABS_Y':
-                    self.LeftJoystickY = event.state / XboxController.MAX_JOY_VAL # normalize between -1 and 1
-                elif event.code == 'ABS_X':
-                    self.LeftJoystickX = event.state / XboxController.MAX_JOY_VAL # normalize between -1 and 1
-                elif event.code == 'ABS_RY':
-                    self.RightJoystickY = event.state / XboxController.MAX_JOY_VAL # normalize between -1 and 1
-                elif event.code == 'ABS_RX':
-                    self.RightJoystickX = event.state / XboxController.MAX_JOY_VAL # normalize between -1 and 1
-                elif event.code == 'ABS_Z':
-                    self.LeftTrigger = event.state / XboxController.MAX_TRIG_VAL # normalize between 0 and 1
-                elif event.code == 'ABS_RZ':
-                    self.RightTrigger = event.state / XboxController.MAX_TRIG_VAL # normalize between 0 and 1
-                elif event.code == 'BTN_TL':
-                    self.LeftBumper = event.state
-                elif event.code == 'BTN_TR':
-                    self.RightBumper = event.state
-                elif event.code == 'BTN_SOUTH':
-                    self.A = event.state
-                elif event.code == 'BTN_NORTH':
-                    self.Y = event.state #previously switched with X
-                elif event.code == 'BTN_WEST':
-                    self.X = event.state #previously switched with Y
-                elif event.code == 'BTN_EAST':
-                    self.B = event.state
-                elif event.code == 'BTN_THUMBL':
-                    self.LeftThumb = event.state
-                elif event.code == 'BTN_THUMBR':
-                    self.RightThumb = event.state
-                elif event.code == 'BTN_SELECT':
-                    self.Back = event.state
-                elif event.code == 'BTN_START':
-                    self.Start = event.state
-                elif event.code == 'BTN_TRIGGER_HAPPY1':
-                    self.LeftDPad = event.state
-                elif event.code == 'BTN_TRIGGER_HAPPY2':
-                    self.RightDPad = event.state
-                elif event.code == 'BTN_TRIGGER_HAPPY3':
-                    self.UpDPad = event.state
-                elif event.code == 'BTN_TRIGGER_HAPPY4':
-                    self.DownDPad = event.state
-            # Update the ANALOG dictionary
-            self.ANALOG = {
-                'LeftJoystickX': self.LeftJoystickX,
-                'LeftJoystickY': self.LeftJoystickY,
-                'RightJoystickX': self.RightJoystickX,
-                'RightJoystickY': self.RightJoystickY,
-                'LeftTrigger': self.LeftTrigger,
-                'RightTrigger': self.RightTrigger
-            }
-            # Update the DIGITAL dictionary
-            self.DIGITAL = {
-                'LeftBumper': self.LeftBumper,
-                'RightBumper': self.RightBumper,
-                'A': self.A,
-                'B': self.B,
-                'X': self.X,
-                'Y': self.Y,
-                'LeftThumb': self.LeftThumb,
-                'RightThumb': self.RightThumb,
-                'Back': self.Back,
-                'Start': self.Start,
-                'LeftDPad': self.LeftDPad,
-                'RightDPad': self.RightDPad,
-                'UpDPad': self.UpDPad,
-                'DownDPad': self.DownDPad
-            }
-            if function:
-                function(self.DIGITAL, self.ANALOG)
+    def added_joystick(self, joystick: Joystick):
+        print(f"Added {joystick}")
+    def removed_joystick(self, joystick: Joystick):
+        print(f"Removed {joystick}")
+    def key_received(self, key: Key):
+        print(f"Key received: {key}")
+    def update(self, function=None):
+        # Update the ANALOG dictionary
+        self.ANALOG = {
+            'LeftJoystickX' : self.LeftJoystickX,
+            'LeftJoystickY' : self.LeftJoystickY,
+            'RightJoystickX': self.RightJoystickX,
+            'RightJoystickY': self.RightJoystickY,
+            'LeftTrigger'   : self.LeftTrigger,
+            'RightTrigger'  : self.RightTrigger
+        }
+        # Update the DIGITAL dictionary
+        self.DIGITAL = {
+            'LeftBumper' : self.LeftBumper,
+            'RightBumper': self.RightBumper,
+            'A'          : self.A,
+            'B'          : self.B,
+            'X'          : self.X,
+            'Y'          : self.Y,
+            'LeftThumb'  : self.LeftThumb,
+            'RightThumb' : self.RightThumb,
+            'Back'       : self.Back,
+            'Start'      : self.Start,
+            'LeftDPad'   : self.LeftDPad,
+            'RightDPad'  : self.RightDPad,
+            'UpDPad'     : self.UpDPad,
+            'DownDPad'   : self.DownDPad
+        }
+        if function:
+            function(self.DIGITAL, self.ANALOG)
 
 if __name__ == "__main__":
     controller = XboxController()
     while True:
-        digital, analog = controller.read()
-        print("Digital:", digital)
-        print("Analog:", analog)
+        print("Controller:", controller.read())
         # Add a small delay to avoid flooding the output
-        import time
         time.sleep(0.1)  # Adjust the sleep time as needed
