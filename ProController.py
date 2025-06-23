@@ -63,6 +63,7 @@ async def ConnectToController(address:str=None,parent=None):
         if parent:
             parent.controller_state = controller_state
             parent.transport = transport
+        print(f"transport: {transport}, controller_state: {controller_state}")
         return controller_state, transport
         # await transport.close()
 def list_switches():
