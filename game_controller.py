@@ -71,6 +71,16 @@ class XboxController(object):
         print(f"Removed {joystick}")
     def key_received(self, key: Key):
         print(f"Key received: {key.value} ({key.keyname})")
+        match key.keyname:
+            case "Button 0":
+                self.A = key.value
+            case "Button 1":
+                self.B = key.value
+            case "Button 2":
+                self.X = key.value
+            case "Button 3":
+                self.Y = key.value
+        self.update()
     def update(self, function=None):
         # Update the ANALOG dictionary
         self.ANALOG = {
