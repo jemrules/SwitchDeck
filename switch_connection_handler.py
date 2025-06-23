@@ -61,7 +61,7 @@ class test:
         if not self.controller_state:
             print("Controller is not connected")
             return
-        scale=min((scale+1)/2*(0x1000),0x1000-1)
+        scalei=int(min((scale+1)/2*(0x1000),0x1000-1))
         a=None
         match stick.lower()[0]:
             case "l":
@@ -70,9 +70,9 @@ class test:
                 a=self.controller_state.r_stick_state
         match direction.lower()[0]:
             case "x":
-                a.set_h(scale)
+                a.set_h(scalei)
             case "y":
-                a.set_v(scale)
+                a.set_v(scalei)
 
     async def connect_device(self, address=None):
         controller = Controller.PRO_CONTROLLER
