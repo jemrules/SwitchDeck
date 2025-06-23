@@ -102,6 +102,17 @@ class SwitchConnectionHandler:
         print(f"Connected to device at {address}")
     async def run(self):
         while True:
+            if self.send_input:
+                print("Sending input to controller")
+                try:
+                    await asyncio.wait_for(self.controller_state.send(),timeout=0.5)
+                except:
+                    print(f"Controller State is {self.controller_state}")
+                    try:
+                        await self.protocol.get_controller_state().send()
+                    except Exception as e:
+                        print(f"Error sending controller state: {e}")
+                self.send_input = False
             if self.event_queue.empty():
                 await asyncio.sleep(0.1)
                 continue
@@ -130,17 +141,6 @@ class SwitchConnectionHandler:
                     else:
                         print("No device to disconnect")
                     self.event_queue.task_done()
-            if self.send_input:
-                print("Sending input to controller")
-                try:
-                    await asyncio.wait_for(self.controller_state.send(),timeout=0.5)
-                except:
-                    print(f"Controller State is {self.controller_state}")
-                    try:
-                        await self.protocol.get_controller_state().send()
-                    except Exception as e:
-                        print(f"Error sending controller state: {e}")
-                self.send_input = False
 
 if __name__ == "__main__":
     print("Finished")
