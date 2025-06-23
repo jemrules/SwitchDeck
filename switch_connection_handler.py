@@ -55,23 +55,17 @@ class SwitchConnectionHandler:
         self.event_queue.put_nowait((EventType.DISCONNECT_DEVICE, []))
     
     def button_press(self, button_name):
-        if self.controller_state:
-            try:
-                self.controller_state.button_state.set_button(button_name, True)
-                self.send_input = True
-            except:
-                print(f"Button {button_name} not found in controller state")
-        else:
-            print("Controller is not connected")
+        try:
+            self.controller_state.button_state.set_button(button_name, True)
+            self.send_input = True
+        except:
+            print(f"Button {button_name} not found in controller state")
     def button_release(self, button_name):
-        if self.controller_state:
-            try:
-                self.controller_state.button_state.set_button(button_name, False)
-                self.send_input = True
-            except:
-                print(f"Button {button_name} not found in controller state")
-        else:
-            print("Controller is not connected")
+        try:
+            self.controller_state.button_state.set_button(button_name, False)
+            self.send_input = True
+        except:
+            print(f"Button {button_name} not found in controller state")
     def move_stick(self,stick="l",direction="x",scale: float=1):
         if not self.controller_state:
             print("Controller is not connected")
