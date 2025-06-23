@@ -10,50 +10,50 @@ class SteamDeckController(object):
     def __init__(self,function=None):
         self.function = function
         self.DIGITAL = {
-            'A'         : 0,
-            'B'         : 0,
-            'X'         : 0,
-            'Y'         : 0,
-            'LeftBumper': 0,
-            'RightBumper': 0,
-            'LeftTrigger': 0,
+            'A'           : 0,
+            'B'           : 0,
+            'X'           : 0,
+            'Y'           : 0,
+            'LeftBumper'  : 0,
+            'RightBumper' : 0,
+            'LeftTrigger' : 0,
             'RightTrigger': 0,
-            'Back'      : 0,
-            'Start'     : 0,
-            'LeftThumb' : 0,
-            'RightThumb': 0,
-            'UpDPad'    : 0,
-            'DownDPad'  : 0,
-            'LeftDPad'  : 0,
-            'RightDPad' : 0,
-            'Steam'     : 0,
-            'QuickAccess': 0,
-            'L4'        : 0,
-            'L5'        : 0,
-            'R4'        : 0,
-            'R5'        : 0
+            'Back'        : 0,
+            'Start'       : 0,
+            'LeftThumb'   : 0,
+            'RightThumb'  : 0,
+            'UpDPad'      : 0,
+            'DownDPad'    : 0,
+            'LeftDPad'    : 0,
+            'RightDPad'   : 0,
+            'Steam'       : 0,
+            'QuickAccess' : 0,
+            'L4'          : 0,
+            'L5'          : 0,
+            'R4'          : 0,
+            'R5'          : 0
         }
         self.DIGITAL_KEYS = {
             "Button 0" : "A",
             "Button 1" : "B",
             "Button 2" : "Y",
             "Button 3" : "X",
-            "Button 4" : "",
-            "Button 5" : "",
-            "Button 6" : "",
-            "Button 7" : "",
-            "Button 8" : "",
-            "Button 9" : "",
-            "Button 10": "",
+            "Button 4" : "Back",
+            "Button 5" : "Steam",
+            "Button 6" : "Start",
+            "Button 7" : "LeftThumb",
+            "Button 8" : "RightThumb",
+            "Button 9" : "LeftTrigger",
+            "Button 10": "RightTrigger",
             "Button 11": "",
             "Button 12": "",
             "Button 13": "",
             "Button 14": "",
-            "Button 15": "",
-            "Button 16": "",
-            "Button 17": "",
-            "Button 18": "",
-            "Button 19": "",
+            "Button 15": "QuickAccess",
+            "Button 16": "R4",
+            "Button 17": "L4",
+            "Button 18": "R5",
+            "Button 19": "L5",
             "Button 20": ""
         }
         self.ANALOG = {
@@ -82,6 +82,8 @@ class SteamDeckController(object):
     def key_received(self, key: Key):
         if not key.keyname.lower().__contains__("axis"):
             print(f"Key received: {key.value} ({key.keyname})")
+        elif abs(key.value) >0.03:
+            print(f"Key received: {key.value} ({key.keyname}) - Ignored due to low value")
         for key_name, key_value in self.DIGITAL_KEYS.items():
             if key.keyname.lower() == key_name.lower():
                 self.DIGITAL[key_name] = key.value
