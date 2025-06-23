@@ -102,6 +102,7 @@ class InputHandler(SteamDeckController):
     def handle_input(self,digital: dict,analog: dict): #* This method is called after every input loop in super _monitor_controller
         if not self.running:
             return
+        print("Handling input...")
         for key, value in self.JOYCON_DIGITAL_KEYS.items():
             if digital[key]>0.5:
                 button_push(self.controller_state, value)
