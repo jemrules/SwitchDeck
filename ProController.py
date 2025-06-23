@@ -175,6 +175,7 @@ class GUI(QMainWindow):
         self.remove_action.triggered.connect(self.remove_switch)
         self.remove_action.setEnabled(False)
         
+        self.update_switch_list()
         self.refresh_timer=QTimer(self)
         self.refresh_timer.timeout.connect(self.update_switch_list)
         self.refresh_timer.start(5000)  # Refresh every 5 seconds
