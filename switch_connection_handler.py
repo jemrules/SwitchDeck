@@ -135,10 +135,7 @@ class SwitchConnectionHandler:
                         print("No device to disconnect")
                     self.event_queue.task_done()
             if self.controller_state and self.send_input:
-                if self.controller_state.is_connected():
-                    print(f"Controller state: {self.controller_state}")
-                else:
-                    print("Controller is not connected")
+                await self.controller_state.send()
 
 if __name__ == "__main__":
     print("Finished")
