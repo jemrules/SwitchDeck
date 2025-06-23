@@ -212,7 +212,7 @@ class GUI(QMainWindow):
                 self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
                 return
             if self.controller_state is None or self.transport is None:
-                logging.error("Controller state or transport is None after pairing.")
+                logging.error(f"Controller state or transport is None after pairing. transport: {self.transport}, controller_state: {self.controller_state}")
                 self.connection_indicator.setText("Pairing Failed")
                 self.connection_indicator.set_color("red")
                 self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
@@ -256,7 +256,7 @@ class GUI(QMainWindow):
                 self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
                 return
             if self.controller_state is None or self.transport is None:
-                logging.error("Controller state or transport is None after Connecting.")
+                logging.error(f"Controller state or transport is None after pairing. transport: {self.transport}, controller_state: {self.controller_state}")
                 self.connection_indicator.setText("Connecting Failed")
                 self.connection_indicator.set_color("red")
                 self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
