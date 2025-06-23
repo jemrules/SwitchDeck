@@ -201,7 +201,7 @@ class GUI(QMainWindow):
         # Here you would implement the pairing logic
         def pairing():
             try:
-                MAX_PARING_TIMEOUT = 10  # seconds
+                MAX_PARING_TIMEOUT = 20  # seconds
                 RunThreadedAsync(ConnectToController, MAX_PARING_TIMEOUT, None, self)
                 self.connection_indicator.setText("Connected!")
                 self.connection_indicator.set_color("green")
