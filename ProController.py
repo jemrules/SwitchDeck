@@ -145,10 +145,15 @@ GLOBAL_transport = None  # Placeholder for transport object
 async def main():
     global GLOBAL_controller_state, GLOBAL_transport
     while True:
+        await asyncio.sleep(0.1)  # Adjust the sleep time as needed
         if GLOBAL_controller_state is None or GLOBAL_transport is None:
+            print("Controller state or transport is None, attempting to connect...")
             continue
         try:
+            print("Sending controller state...")
             await GLOBAL_controller_state.send()
+            print("Controller state sent successfully.")
+            await asyncio.sleep(0.1)  # Adjust the sleep time as needed
         except Exception as e:
             logging.error(f"Error sending controller state: {e}")
 
