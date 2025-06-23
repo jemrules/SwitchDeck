@@ -32,6 +32,7 @@ class test:
         self._thread.daemon = True
         self._thread.start()
     def init_variables(self):
+        self.capture_file = None
         self.factory = None
         self.transport = None
         self.protocol = None
@@ -74,17 +75,17 @@ class test:
                 a.set_v(scale)
 
     async def connect_device(self, address=None):
-        with utils.get_output(default=None) as capture_file:
-            controller = Controller.PRO_CONTROLLER
-            self.spi_flash = FlashMemory()
-            self.factory = controller_protocol_factory(controller,spi_flash=self.spi_flash)
-            ctl_psm, itr_psm = 17, 19
-            self.transport, self.protocol = await create_hid_server(self.factory,reconnect_bt_addr=address,ctl_psm=ctl_psm,itr_psm=itr_psm)
-            self.controller_state = self.protocol.get_controller_state()
-            if not self.controller_state or not self.transport:
-                print("Failed to connect to device")
-                return
-            await self.controller_state.connect()
+        self.capture_file = utils.get_output(default=None)
+        controller = Controller.PRO_CONTROLLER
+        self.spi_flash = FlashMemory()
+        self.factory = controller_protocol_factory(controller,spi_flash=self.spi_flash)
+        ctl_psm, itr_psm = 17, 19
+        self.transport, self.protocol = await create_hid_server(self.factory,reconnect_bt_addr=address,ctl_psm=ctl_psm,itr_psm=itr_psm)
+        self.controller_state = self.protocol.get_controller_state()
+        if not self.controller_state or not self.transport:
+            print("Failed to connect to device")
+            return
+        await self.controller_state.connect()
         print(f"Connected to device at {address}")
         self.event_queue.task_done()
     async def run(self):
