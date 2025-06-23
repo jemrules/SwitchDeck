@@ -7,7 +7,8 @@ class SteamDeckController(object):
     MAX_TRIG_VAL = math.pow(2, 8)
     MAX_JOY_VAL = math.pow(2, 15)
 
-    def __init__(self):
+    def __init__(self,function=None):
+        self.function = function
         self.DIGITAL = {
             'A'         : 0,
             'B'         : 0,
@@ -74,15 +75,6 @@ class SteamDeckController(object):
         self._monitor_thread = threading.Thread(target=run_event_loop, args=(self.added_joystick, self.removed_joystick, self.key_received))
         self._monitor_thread.daemon = True
         self._monitor_thread.start()
-
-
-    def read(self): # return the buttons/triggers that you care about in this methode
-        x = self.LeftJoystickX
-        y = self.LeftJoystickY
-        a = self.A
-        b = self.X # b=1, x=2
-        rb = self.RightBumper
-        return [x, y, a, b, rb]
     def added_joystick(self, joystick: Joystick):
         print(f"Added {joystick}")
     def removed_joystick(self, joystick: Joystick):
@@ -94,34 +86,8 @@ class SteamDeckController(object):
             if key.keyname.lower() == key_name.lower():
                 self.DIGITAL[key_name] = key.value
                 break
-        self.update()
+        self.update(self.function)
     def update(self, function=None):
-        # Update the ANALOG dictionary
-        self.ANALOG = {
-            'LeftJoystickX' : self.LeftJoystickX,
-            'LeftJoystickY' : self.LeftJoystickY,
-            'RightJoystickX': self.RightJoystickX,
-            'RightJoystickY': self.RightJoystickY,
-            'LeftTrigger'   : self.LeftTrigger,
-            'RightTrigger'  : self.RightTrigger
-        }
-        # Update the DIGITAL dictionary
-        self.DIGITAL = {
-            'LeftBumper' : self.LeftBumper,
-            'RightBumper': self.RightBumper,
-            'A'          : self.A,
-            'B'          : self.B,
-            'X'          : self.X,
-            'Y'          : self.Y,
-            'LeftThumb'  : self.LeftThumb,
-            'RightThumb' : self.RightThumb,
-            'Back'       : self.Back,
-            'Start'      : self.Start,
-            'LeftDPad'   : self.LeftDPad,
-            'RightDPad'  : self.RightDPad,
-            'UpDPad'     : self.UpDPad,
-            'DownDPad'   : self.DownDPad
-        }
         if function:
             function(self.DIGITAL, self.ANALOG)
 
