@@ -45,16 +45,15 @@ class SteamDeckController(object):
             "Button 8" : "RightThumb",
             "Button 9" : "LeftTrigger",
             "Button 10": "RightTrigger",
-            "Button 11": "",
-            "Button 12": "",
-            "Button 13": "",
-            "Button 14": "",
+            "Button 11": "UpDPad",
+            "Button 12": "DownDPad",
+            "Button 13": "LeftDPad",
+            "Button 14": "RightDPad",
             "Button 15": "QuickAccess",
             "Button 16": "R4",
             "Button 17": "L4",
             "Button 18": "R5",
             "Button 19": "L5",
-            "Button 20": ""
         }
         self.ANALOG = {
             'LeftJoystickX' : 0,
@@ -99,6 +98,9 @@ class SteamDeckController(object):
             for key_name, key_value in self.ANALOG_KEYS.items():
                 if key.keyname.lower() == key_name.lower():
                     self.ANALOG[key_value[:-1]] = -key.value if (key_value.endswith('-')) != (key_name.startswith("-")) else key.value
+                    break
+        self.DIGITAL['LeftTrigger']  = 1 if self.ANALOG['LeftTrigger'] > 0.25 else 0
+        self.DIGITAL['RightTrigger'] = 1 if self.ANALOG['RightTrigger'] > 0.25 else 0
         self.update(self.function)
     def update(self, function=None):
         if function:
