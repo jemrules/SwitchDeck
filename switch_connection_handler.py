@@ -112,7 +112,7 @@ if __name__ == "__main__":
     print("Finished")
     t = test()
     t.event_connect_device("60:6B:FF:9B:65:C9")
-    sleep(1)
+    sleep(7)
     t.button_press("home")
     while True:
         ...
