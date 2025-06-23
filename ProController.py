@@ -245,8 +245,7 @@ class GUI(QMainWindow):
         self.SWITCH_ADDRESS = self.list_of_switches.currentItem().data(Qt.UserRole) if self.list_of_switches.currentItem() else None
         def reconnecting():
             try:
-                MAX_PARING_TIMEOUT = 10  # seconds
-                RunThreadedAsync(ConnectToController, MAX_PARING_TIMEOUT, self.SWITCH_ADDRESS, self)
+                RunAsync(ConnectToController, self.SWITCH_ADDRESS, self)
                 self.connection_indicator.setText("Connected!")
                 self.connection_indicator.set_color("green")
                 self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.PAIRED)
