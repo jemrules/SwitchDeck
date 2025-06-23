@@ -104,7 +104,15 @@ class test:
                     finally:
                         self.event_queue.task_done()
                 case EventType.DISCONNECT_DEVICE:
-                    ...
+                    print(f"Event: {event_type.value}, Args: {args}")
+                    if self.controller_state:
+                        await self.transport.close()
+                        self.controller_state = None
+                        self.init_variables()
+                        print("Disconnected device")
+                    else:
+                        print("No device to disconnect")
+                    self.event_queue.task_done()
             if self.controller_state and self.send_input:
                 if self.controller_state.is_connected():
                     print(f"Controller state: {self.controller_state}")
@@ -121,6 +129,9 @@ if __name__ == "__main__":
     t.button_release("home")
     sleep(1)
     t.move_stick("l","x",1)
-    while True:
-        ...
+    sleep(1)
+    t.move_stick("l","x",-1)
+    sleep(1)
+    t.event_disconnect_device()
+    sleep(1)
 
