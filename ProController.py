@@ -43,7 +43,6 @@ async def btnpush(btn,controller_state):
     print("Controller state sent.")
 def button_push(controller_state, btn):
     asyncio.run(btnpush(btn, controller_state))
-    asyncio.run(controller_state.send())
 async def btnrelease(btn,controller_state):
     print(f"Releasing button: {btn}")
     controller_state.button_state.set_button(btn, False)
@@ -51,7 +50,6 @@ async def btnrelease(btn,controller_state):
     print("Controller state sent.")
 def button_release(controller_state, btn):
     asyncio.run(btnrelease(btn, controller_state))
-    asyncio.run(controller_state.send())
 async def move_stick(controller_state,stick="l",direction="x",scale=1):
     scale=min((scale+1)/2*(0x1000),0x1000-1)
     a=None
@@ -144,6 +142,14 @@ class ConnectionStatus(Enum):
 GLOBAL_controller_state = None  # Placeholder for controller state
 GLOBAL_transport = None  # Placeholder for transport object
 
+async def main():
+    global GLOBAL_controller_state, GLOBAL_transport
+    while True:
+        if GLOBAL_controller_state is None or GLOBAL_transport is None:
+            continue
+        try:
+            await GLOBAL_controller_state.send()
+
 class GUI(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -207,6 +213,10 @@ class GUI(QMainWindow):
         self.SWITCH_ADDRESS = "00:00:00:00:00:00"  # Placeholder for switch address
         self.controller_state = None  # Placeholder for controller state
         self.transport = None  # Placeholder for transport object
+
+        self.async_var={}
+        self.async_send={}
+        self.async_thread=threading.Thread(target=asyncio.run, args=(main(),), daemon=True)
         
         self.XboxController = InputHandler(self.controller_state)  # Initialize Xbox controller
 
