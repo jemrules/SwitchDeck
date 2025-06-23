@@ -198,10 +198,17 @@ class GUI(QMainWindow):
         # Here you would implement the pairing logic
         pair_event=Event(self)
         def pairing():
-            self.controller_state, self.transport = RunAsync(ConnectToController) # Pairing to new device
-            self.connection_indicator.setText("Connected!")
-            self.connection_indicator.set_color("green")
-            self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.PAIRED)
+            try:
+                self.controller_state, self.transport = RunAsync(ConnectToController) # Pairing to new device
+                self.connection_indicator.setText("Connected!")
+                self.connection_indicator.set_color("green")
+                self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.PAIRED)
+            except Exception as e:
+                logging.error(f"Pairing failed: {e}")
+                self.connection_indicator.setText("Pairing Failed")
+                self.connection_indicator.set_color("red")
+                self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
+                return
             print(f"Pairing successful. {self.current_connection}")
         pair_event.connect(pairing)
         pair_event.trigger()
