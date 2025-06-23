@@ -193,7 +193,7 @@ class GUI(QMainWindow):
 
         self.SWITCH_ADDRESS = "00:00:00:00:00:00"  # Placeholder for switch address
         
-        self.XboxController = InputHandler(self.SwitchHandler.controller_state)  # Initialize Xbox controller
+        self.XboxController = InputHandler(self.SwitchHandler)  # Initialize Xbox controller
 
         from typing import Tuple
         self.update_switch_list()
