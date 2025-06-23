@@ -3,16 +3,16 @@
 from time import sleep
 from enum import Enum
 import subprocess
+import threading
 import argparse
 import asyncio
 import logging
 import sys
 import os
 import re
- #test
 
 from game_controller import XboxController
-from misc import Indicator, Event, RunAsync
+from misc import Indicator, Event, RunAsync, RunThreadedAsync
 
 from aioconsole import ainput
 
@@ -48,7 +48,7 @@ async def move_stick(controller_state,stick="l",direction="x",scale=1):
         case "y":
             a.set_v(scale)
 
-async def ConnectToController(address:str=None):
+async def ConnectToController(address:str=None,parent=None):
     with utils.get_output(default=None) as capture_file:
         controller = Controller.PRO_CONTROLLER
         spi_flash = FlashMemory()
@@ -60,6 +60,9 @@ async def ConnectToController(address:str=None):
                                                       itr_psm=itr_psm)
         controller_state = protocol.get_controller_state()
         await controller_state.connect()
+        if parent:
+            parent.controller_state = controller_state
+            parent.transport = transport
         return controller_state, transport
         # await transport.close()
 def list_switches():
@@ -199,7 +202,7 @@ class GUI(QMainWindow):
         pair_event=Event(self)
         def pairing():
             try:
-                self.controller_state, self.transport = RunAsync(ConnectToController) # Pairing to new device
+                RunThreadedAsync(ConnectToController, 5)
                 self.connection_indicator.setText("Connected!")
                 self.connection_indicator.set_color("green")
                 self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.PAIRED)
@@ -222,6 +225,7 @@ class GUI(QMainWindow):
                 self.transport.close()
             except Exception as e:
                 logging.error(f"Disconnection failed: {e}")
+        self.controller_state, self.transport = None
         self.connection_indicator.setText("Disconnected")
         self.connection_indicator.set_color("red")
         self.current_connection = (ConnectionStatus.DISCONNECTED, ConnectionType.UNPAIRED)
@@ -231,18 +235,18 @@ class GUI(QMainWindow):
         self.connection_indicator.setText("Reconnecting...")
         self.connection_indicator.set_color("yellow")
         self.current_connection = (ConnectionStatus.RECONNECTING, ConnectionType.DIRECT_CONNECT)
-        try:
-            ...
-        except Exception as e:
-            logging.error(f"Reconnection failed: {e}")
-            self.connection_indicator.setText("Reconnection Failed")
-            self.connection_indicator.set_color("red")
-            self.current_connection = (ConnectionStatus.ERROR, ConnectionType.DIRECT_CONNECT)
-            return
         def reconnecting():
-            self.connection_indicator.setText("Reconnected")
-            self.connection_indicator.set_color("green")
-            self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.DIRECT_CONNECT)
+            try:
+                #TODO: Code to reconnect to the switch goes here
+                self.connection_indicator.setText("Reconnected")
+                self.connection_indicator.set_color("green")
+                self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.DIRECT_CONNECT)
+            except Exception as e:
+                logging.error(f"Reconnection failed: {e}")
+                self.connection_indicator.setText("Reconnection Failed")
+                self.connection_indicator.set_color("red")
+                self.current_connection = (ConnectionStatus.ERROR, ConnectionType.DIRECT_CONNECT)
+                return
         reconnect_event = Event(self)
         reconnect_event.connect(reconnecting)
         reconnect_event.trigger()

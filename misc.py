@@ -3,6 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from enum import Enum
 import asyncio
+from threading import Thread
 
 class Indicator(QLabel):
     def __init__(self, text:str="", parent=None):
@@ -27,4 +28,20 @@ class Event(QTimer):
         self.start(1)
 def RunAsync(func,*args, **kwargs):
     loop = asyncio.get_event_loop()
-    return loop.run_until_complete(func(*args, **kwargs))
+    try:
+        return loop.run_until_complete(func(*args, **kwargs))
+    except RuntimeError as e:
+        raise e
+    finally:
+        loop.close()
+def RunThreadedAsync(func, timeout: float | None, *args, **kwargs):
+    def run_in_thread():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            loop.run_until_complete(func(*args, **kwargs))
+        finally:
+            loop.close()
+    thread = Thread(target=run_in_thread)
+    thread.start()
+    thread.join(timeout)
