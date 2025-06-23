@@ -198,11 +198,10 @@ class GUI(QMainWindow):
         self.connection_indicator.set_color("yellow")
         self.current_connection = (ConnectionStatus.PAIRING, ConnectionType.PAIRED)
         # Here you would implement the pairing logic
-        pair_event=Event(self)
         def pairing():
             try:
                 MAX_PARING_TIMEOUT = 10  # seconds
-                RunThreadedAsync(ConnectToController, MAX_PARING_TIMEOUT)
+                RunThreadedAsync(ConnectToController, MAX_PARING_TIMEOUT, None, self)
                 self.connection_indicator.setText("Connected!")
                 self.connection_indicator.set_color("green")
                 self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.PAIRED)
@@ -219,6 +218,7 @@ class GUI(QMainWindow):
                 self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
                 return
             print(f"Pairing successful. {self.current_connection}")
+        pair_event=Event(self)
         pair_event.connect(pairing)
         pair_event.trigger()
     def disconnect_switch(self):
@@ -241,17 +241,25 @@ class GUI(QMainWindow):
         self.connection_indicator.setText("Reconnecting...")
         self.connection_indicator.set_color("yellow")
         self.current_connection = (ConnectionStatus.RECONNECTING, ConnectionType.DIRECT_CONNECT)
+        self.SWITCH_ADDRESS = self.list_of_switches.currentItem().data(Qt.UserRole) if self.list_of_switches.currentItem() else None
         def reconnecting():
             try:
-                #TODO: Code to reconnect to the switch goes here
-                self.connection_indicator.setText("Reconnected")
+                MAX_PARING_TIMEOUT = 10  # seconds
+                RunThreadedAsync(ConnectToController, MAX_PARING_TIMEOUT, self.SWITCH_ADDRESS, self)
+                self.connection_indicator.setText("Connected!")
                 self.connection_indicator.set_color("green")
-                self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.DIRECT_CONNECT)
+                self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.PAIRED)
             except Exception as e:
-                logging.error(f"Reconnection failed: {e}")
-                self.connection_indicator.setText("Reconnection Failed")
+                logging.error(f"Connecting failed: {e}")
+                self.connection_indicator.setText("Connecting Failed")
                 self.connection_indicator.set_color("red")
-                self.current_connection = (ConnectionStatus.ERROR, ConnectionType.DIRECT_CONNECT)
+                self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
+                return
+            if self.controller_state is None or self.transport is None:
+                logging.error("Controller state or transport is None after Connecting.")
+                self.connection_indicator.setText("Connecting Failed")
+                self.connection_indicator.set_color("red")
+                self.current_connection = (ConnectionStatus.ERROR, ConnectionType.PAIRED)
                 return
         reconnect_event = Event(self)
         reconnect_event.connect(reconnecting)
@@ -263,6 +271,7 @@ class GUI(QMainWindow):
         for item in selected_items:
             self.list_of_switches.takeItem(self.list_of_switches.row(item))
             # Here you would implement the logic to remove the switch from the system
+            os.system(f"bluetoothctl remove {item.text()}")
             logging.info(f"Removed switch: {item.text()}")
         self.remove_action.setEnabled(False)
         self.reconnect_action.setEnabled(False)
