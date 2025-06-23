@@ -80,7 +80,9 @@ class test:
         self.factory = controller_protocol_factory(controller,spi_flash=self.spi_flash)
         ctl_psm, itr_psm = 17, 19
         self.transport, self.protocol = await create_hid_server(self.factory,reconnect_bt_addr=address,ctl_psm=ctl_psm,itr_psm=itr_psm)
+        print("After create_hid_server")
         self.controller_state = self.protocol.get_controller_state()
+        print("after get_controller_state")
         if not self.controller_state or not self.transport:
             print("Failed to connect to device")
             return
