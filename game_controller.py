@@ -65,12 +65,18 @@ class SteamDeckController(object):
             'RightTrigger'  : 0
         }
         self.ANALOG_KEYS = {
-            "Axis 0" : "",
-            "-Axis 0" : "",
-            "Axis 1" : "",
-            "-Axis 1" : "",
-            "Axis 2" : "",
-            "Axis 3" : ""
+            "Axis 0" : "LeftJoystickX+",
+            "-Axis 0": "LeftJoystickX-",
+            "Axis 1" : "LeftJoystickY-",
+            "-Axis 1": "LeftJoystickY+",
+
+            "Axis 2" : "RightJoystickX+",
+            "-Axis 2": "RightJoystickX-",
+            "Axis 3" : "RightJoystickY-",
+            "-Axis 3": "RightJoystickY+",
+
+            "Axis 4" : "LeftTrigger+",
+            "Axis 5" : "RightTrigger+"
         }
         self._monitor_thread = threading.Thread(target=run_event_loop, args=(self.added_joystick, self.removed_joystick, self.key_received))
         self._monitor_thread.daemon = True
@@ -84,10 +90,15 @@ class SteamDeckController(object):
             print(f"Key received: {key.value} ({key.keyname})")
         elif abs(key.value) >0.07:
             print(f"Key received: {key.value} ({key.keyname}) - Ignored due to low value")
-        for key_name, key_value in self.DIGITAL_KEYS.items():
-            if key.keyname.lower() == key_name.lower():
-                self.DIGITAL[key_name] = key.value
-                break
+        if key.keyname.lower().__contains__("button"):
+            for key_name, key_value in self.DIGITAL_KEYS.items():
+                if key.keyname.lower() == key_name.lower():
+                    self.DIGITAL[key_name] = key.value
+                    break
+        elif key.keyname.lower().__contains__("axis"):
+            for key_name, key_value in self.ANALOG_KEYS.items():
+                if key.keyname.lower() == key_name.lower():
+                    self.ANALOG[key_value[:-1]] = -key.value if (key_value.endswith('-')) != (key_name.startswith("-")) else key.value
         self.update(self.function)
     def update(self, function=None):
         if function:
