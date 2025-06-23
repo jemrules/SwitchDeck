@@ -48,6 +48,7 @@ class SwitchConnectionHandler:
         self.spi_flash=None
     def event_connect_device(self, address=None):
         print(f"Connecting to device at {address}")
+        self.status = ConnectionStatus.RECONNECTING if address else ConnectionStatus.PAIRING
         self.event_queue.put_nowait((EventType.CONNECT_DEVICE, [address]))
     def event_disconnect_device(self):
         print("Disconnecting device")

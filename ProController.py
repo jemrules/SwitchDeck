@@ -250,23 +250,19 @@ class GUI(QMainWindow):
         self.SwitchHandler.status = (ConnectionStatus.PAIRING)
         # Here you would implement the pairing logic
         def pairing():
-            try:
-                
-                self.connection_indicator.setText("Connected!")
-                self.connection_indicator.set_color("green")
-                self.SwitchHandler.status = (ConnectionStatus.CONNECTED)
-            except Exception as e:
-                logging.error(f"Pairing failed: {e}")
-                self.connection_indicator.setText("Pairing Failed")
-                self.connection_indicator.set_color("red")
-                self.SwitchHandler.status = (ConnectionStatus.ERROR)
-                return
-            if self.SwitchHandler.controller_state is None or self.SwitchHandler.transport is None:
-                logging.error(f"Controller state or transport is None after pairing. transport: {self.SwitchHandler.transport}, controller_state: {self.SwitchHandler.controller_state}")
-                self.connection_indicator.setText("Pairing Failed")
-                self.connection_indicator.set_color("red")
-                self.SwitchHandler.status = (ConnectionStatus.ERROR)
-                return
+            self.SwitchHandler.event_connect_device()
+            while self.SwitchHandler.status == ConnectionStatus.PAIRING:
+                sleep(0.1)
+            match self.SwitchHandler.status:
+                case ConnectionStatus.CONNECTED:
+                    self.connection_indicator.setText("Paired!")
+                    self.connection_indicator.set_color("green")
+                case ConnectionStatus.DISCONNECTED:
+                    self.connection_indicator.setText("Pairing Failed")
+                    self.connection_indicator.set_color("red")
+                case ConnectionStatus.ERROR:
+                    self.connection_indicator.setText("Pairing Error")
+                    self.connection_indicator.set_color("red")
             print(f"Pairing successful. {self.SwitchHandler.status}")
         pair_event=Event(self)
         pair_event.connect(pairing)
@@ -276,8 +272,7 @@ class GUI(QMainWindow):
         if self.SwitchHandler.controller_state:
             # Assuming controller_state has a disconnect method
             try:
-                loop=asyncio.get_event_loop()
-                loop.run_until_complete(self.SwitchHandler.controller_state.disconnect())
+                self.SwitchHandler.event_disconnect_device()
                 self.SwitchHandler.transport.close()
             except Exception as e:
                 logging.error(f"Disconnection failed: {e}")
@@ -293,23 +288,19 @@ class GUI(QMainWindow):
         self.SwitchHandler.status = (ConnectionStatus.RECONNECTING)
         self.SWITCH_ADDRESS = self.list_of_switches.currentItem().data(Qt.UserRole) if self.list_of_switches.currentItem() else None
         def reconnecting():
-            try:
-                RunAsync(ConnectToController, self.SWITCH_ADDRESS, self)
-                self.connection_indicator.setText("Connected!")
-                self.connection_indicator.set_color("green")
-                self.SwitchHandler.status = (ConnectionStatus.CONNECTED)
-            except Exception as e:
-                logging.error(f"Connecting failed: {e}")
-                self.connection_indicator.setText("Connecting Failed")
-                self.connection_indicator.set_color("red")
-                self.SwitchHandler.status = (ConnectionStatus.ERROR)
-                return
-            if self.SwitchHandler.controller_state is None or self.SwitchHandler.transport is None:
-                logging.error(f"Controller state or transport is None after pairing. transport: {self.SwitchHandler.transport}, controller_state: {self.SwitchHandler.controller_state}")
-                self.connection_indicator.setText("Connecting Failed")
-                self.connection_indicator.set_color("red")
-                self.SwitchHandler.status = (ConnectionStatus.ERROR)
-                return
+            self.SwitchHandler.event_connect_device(self.SWITCH_ADDRESS)
+            while self.SwitchHandler.status == ConnectionStatus.RECONNECTING:
+                sleep(0.1)
+            match self.SwitchHandler.status:
+                case ConnectionStatus.CONNECTED:
+                    self.connection_indicator.setText("Reconnected!")
+                    self.connection_indicator.set_color("green")
+                case ConnectionStatus.DISCONNECTED:
+                    self.connection_indicator.setText("Disconnected")
+                    self.connection_indicator.set_color("red")
+                case ConnectionStatus.ERROR:
+                    self.connection_indicator.setText("Reconnection Failed")
+                    self.connection_indicator.set_color("red")
         reconnect_event = Event(self)
         reconnect_event.connect(reconnecting)
         reconnect_event.trigger()
