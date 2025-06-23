@@ -198,7 +198,7 @@ class GUI(QMainWindow):
         # Here you would implement the pairing logic
         pair_event=Event(self)
         def pairing():
-            ConnectToController(None)
+            self.controller_state, self.transport = RunAsync(ConnectToController) # Pairing to new device
             self.connection_indicator.setText("Connected!")
             self.connection_indicator.set_color("green")
             self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.PAIRED)
