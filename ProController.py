@@ -60,6 +60,7 @@ async def move_stick(controller_state,stick="l",direction="x",scale=1):
             a.set_v(scale)
 
 async def ConnectToController(address:str=None,parent=None):
+    global GLOBAL_controller_state, GLOBAL_transport
     with utils.get_output(default=None) as capture_file:
         controller = Controller.PRO_CONTROLLER
         spi_flash = FlashMemory()
@@ -74,6 +75,8 @@ async def ConnectToController(address:str=None,parent=None):
         if parent:
             parent.controller_state = controller_state
             parent.transport = transport
+        GLOBAL_controller_state = controller_state
+        GLOBAL_transport = transport
         print(f"transport: {transport}, controller_state: {controller_state}")
         return controller_state, transport
         # await transport.close()
@@ -113,10 +116,10 @@ class InputHandler(SteamDeckController):
         print("Handling input...")
         for key, value in self.JOYCON_DIGITAL_KEYS.items():
             if digital[key]>0.5:
-                button_push(self.parent.controller_state, value)
+                button_push(GLOBAL_controller_state, value)
                 print(f"Button pushed: {key} -> {value}")
             else:
-                button_release(self.parent.controller_state, value)
+                button_release(GLOBAL_controller_state, value)
 class ConnectionType(Enum):
     PAIRED = "paired"
     UNPAIRED = "unpaired"
@@ -129,8 +132,8 @@ class ConnectionStatus(Enum):
     PAIRING = "pairing"
     ERROR = "error"
 
-# controller_state = None  # Placeholder for controller state
-# transport = None  # Placeholder for transport object
+GLOBAL_controller_state = None  # Placeholder for controller state
+GLOBAL_transport = None  # Placeholder for transport object
 
 class GUI(QMainWindow):
     def __init__(self):
