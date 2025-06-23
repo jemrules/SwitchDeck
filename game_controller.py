@@ -93,6 +93,8 @@ class SteamDeckController(object):
             for key_name, key_value in self.DIGITAL_KEYS.items():
                 if key.keyname.lower() == key_name.lower():
                     self.DIGITAL[key_name] = key.value
+                    if key.value>0.5:
+                        print(f"Key pressed: {key_value} ({key.keyname})")
                     break
         elif key.keyname.lower().__contains__("axis"):
             for key_name, key_value in self.ANALOG_KEYS.items():
