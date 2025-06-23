@@ -70,7 +70,7 @@ class XboxController(object):
     def removed_joystick(self, joystick: Joystick):
         print(f"Removed {joystick}")
     def key_received(self, key: Key):
-        print(f"Key received: {key}")
+        print(f"Key received: {key.value}")
     def update(self, function=None):
         # Update the ANALOG dictionary
         self.ANALOG = {
