@@ -171,6 +171,9 @@ class GUI(QMainWindow):
     def Close(self):
         super().close()
         return None
+    def close(self):
+        sys.exit(0)
+        return super().close()
     def update_connection_menu(self): #! Doesn't Trigger
         print("Updating connection menu...")
         match self.current_connection[0]:
@@ -202,7 +205,8 @@ class GUI(QMainWindow):
         pair_event=Event(self)
         def pairing():
             try:
-                RunThreadedAsync(ConnectToController, 5)
+                MAX_PARING_TIMEOUT = 10  # seconds
+                RunThreadedAsync(ConnectToController, MAX_PARING_TIMEOUT)
                 self.connection_indicator.setText("Connected!")
                 self.connection_indicator.set_color("green")
                 self.current_connection = (ConnectionStatus.CONNECTED, ConnectionType.PAIRED)
