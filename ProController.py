@@ -115,6 +115,7 @@ class InputHandler(SteamDeckController):
             return
         print("Handling input...")
         for key, value in self.JOYCON_DIGITAL_KEYS.items():
+            print(f"Key: {key}, Value: {value}, Digital Value: {digital[key]}")
             if digital[key]>0.5:
                 button_push(GLOBAL_controller_state, value)
                 print(f"Button pushed: {key} -> {value}")
