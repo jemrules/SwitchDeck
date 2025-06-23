@@ -88,7 +88,6 @@ class test:
             return
         await self.controller_state.connect()
         print(f"Connected to device at {address}")
-        self.event_queue.task_done()
     async def run(self):
         while True:
             if self.event_queue.empty():
@@ -99,7 +98,10 @@ class test:
                 case EventType.CONNECT_DEVICE:
                     print(f"Event: {event_type.value}, Args: {args}")
                     address = args[0] if args else None
-                    await self.connect_device(address)
+                    try:
+                        await self.connect_device(address)
+                    finally:
+                        self.event_queue.task_done()
                 case EventType.DISCONNECT_DEVICE:
                     ...
             if self.controller_state and self.send_input:
