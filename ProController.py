@@ -297,7 +297,7 @@ class GUI(QMainWindow):
                 self.transport.close()
             except Exception as e:
                 logging.error(f"Disconnection failed: {e}")
-        self.controller_state, self.transport = None
+        self.controller_state, self.transport = None, None
         self.connection_indicator.setText("Disconnected")
         self.connection_indicator.set_color("red")
         self.current_connection = (ConnectionStatus.DISCONNECTED, ConnectionType.UNPAIRED)
