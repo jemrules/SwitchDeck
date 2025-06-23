@@ -77,7 +77,7 @@ class InputHandler(XboxController):
         super().__init__()
         self.controller_state = controller_state
         self.running = True
-        self.input_thread = threading.Thread(target=self.handle_input)
+        self.input_thread = threading.Thread(target=self.handle_input, args=(self.DIGITAL, self.ANALOG))
         self.input_thread.start()
     
     def handle_input(self,digital: dict,analog: dict): #* This method is called after every input loop in super _monitor_controller
