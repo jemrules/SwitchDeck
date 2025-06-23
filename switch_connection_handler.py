@@ -114,6 +114,10 @@ if __name__ == "__main__":
     t.event_connect_device("60:6B:FF:9B:65:C9")
     sleep(7)
     t.button_press("home")
+    sleep(0.2)
+    t.button_release("home")
+    sleep(1)
+    t.move_stick("l","x",0.5)
     while True:
         ...
 
