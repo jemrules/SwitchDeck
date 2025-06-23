@@ -35,19 +35,22 @@ async def press_btn(controller_state,btn,duration=0.1):
     await asyncio.sleep(duration)
     controller_state.button_state.set_button(btn, False)
     await controller_state.send()
+async def btnpush(btn,controller_state):
+    print(f"Pushing button: {btn}")
+    controller_state.button_state.set_button(btn, True)
+    print(f"Button {btn} pushed.")
+    await controller_state.send()
+    print("Controller state sent.")
 def button_push(controller_state, btn):
-    async def push():
-        print(f"Pushing button: {btn}")
-        controller_state.button_state.set_button(btn, True)
-        print(f"Button {btn} pushed.")
-        await controller_state.send()
-        print("Controller state sent.")
-    RunAsync(push)
+    RunAsync(btnpush, btn, controller_state)
+async def btnrelease(btn,controller_state):
+    print(f"Releasing button: {btn}")
+    controller_state.button_state.set_button(btn, False)
+    print(f"Button {btn} released.")
+    await controller_state.send()
+    print("Controller state sent.")
 def button_release(controller_state, btn):
-    async def release():
-        controller_state.button_state.set_button(btn, False)
-        await controller_state.send()
-    RunAsync(release)
+    RunAsync(btnrelease, btn, controller_state)
 async def move_stick(controller_state,stick="l",direction="x",scale=1):
     scale=min((scale+1)/2*(0x1000),0x1000-1)
     a=None
