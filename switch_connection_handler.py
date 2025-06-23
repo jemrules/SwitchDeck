@@ -56,8 +56,11 @@ class SwitchConnectionHandler:
     
     def button_press(self, button_name):
         if self.controller_state:
-            self.controller_state.button_state.set_button(button_name, True)
-            self.send_input = True
+            try:
+                self.controller_state.button_state.set_button(button_name, True)
+                self.send_input = True
+            except:
+                print(f"Button {button_name} not found in controller state")
         else:
             print("Controller is not connected")
     def button_release(self, button_name):
