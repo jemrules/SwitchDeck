@@ -138,4 +138,14 @@ class XboxController(object):
                 'DownDPad': self.DownDPad
             }
             if function:
-                function()
+                function(self.DIGITAL, self.ANALOG)
+
+if __name__ == "__main__":
+    controller = XboxController()
+    while True:
+        digital, analog = controller.read()
+        print("Digital:", digital)
+        print("Analog:", analog)
+        # Add a small delay to avoid flooding the output
+        import time
+        time.sleep(0.1)  # Adjust the sleep time as needed
