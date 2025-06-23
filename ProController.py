@@ -104,6 +104,7 @@ class InputHandler(SteamDeckController):
         for key, value in self.JOYCON_DIGITAL_KEYS.items():
             if digital[key]>0.5:
                 button_push(self.controller_state, value)
+                print(f"Button pushed: {key} -> {value}")
             else:
                 button_release(self.controller_state, value)
 class ConnectionType(Enum):
