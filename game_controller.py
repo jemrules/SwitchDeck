@@ -34,26 +34,26 @@ class SteamDeckController(object):
             'R5'          : 0
         }
         self.DIGITAL_KEYS = {
-            "Button 0" : "A",
-            "Button 1" : "B",
-            "Button 2" : "Y",
-            "Button 3" : "X",
-            "Button 4" : "Back",
-            "Button 5" : "Steam",
-            "Button 6" : "Start",
-            "Button 7" : "LeftThumb",
-            "Button 8" : "RightThumb",
-            "Button 9" : "LeftTrigger",
-            "Button 10": "RightTrigger",
-            "Button 11": "UpDPad",
-            "Button 12": "DownDPad",
-            "Button 13": "LeftDPad",
-            "Button 14": "RightDPad",
-            "Button 15": "QuickAccess",
-            "Button 16": "R4",
-            "Button 17": "L4",
-            "Button 18": "R5",
-            "Button 19": "L5",
+            "button 0" : "A",
+            "button 1" : "B",
+            "button 2" : "Y",
+            "button 3" : "X",
+            "button 4" : "Back",
+            "button 5" : "Steam",
+            "button 6" : "Start",
+            "button 7" : "LeftThumb",
+            "button 8" : "RightThumb",
+            "button 9" : "LeftTrigger",
+            "button 10": "RightTrigger",
+            "button 11": "UpDPad",
+            "button 12": "DownDPad",
+            "button 13": "LeftDPad",
+            "button 14": "RightDPad",
+            "button 15": "QuickAccess",
+            "button 16": "R4",
+            "button 17": "L4",
+            "button 18": "R5",
+            "button 19": "L5",
         }
         self.ANALOG = {
             'LeftJoystickX' : 0,
@@ -64,18 +64,18 @@ class SteamDeckController(object):
             'RightTrigger'  : 0
         }
         self.ANALOG_KEYS = {
-            "Axis 0" : "LeftJoystickX+",
-            "-Axis 0": "LeftJoystickX-",
-            "Axis 1" : "LeftJoystickY-",
-            "-Axis 1": "LeftJoystickY+",
+            "axis 0" : "LeftJoystickX+",
+            "-axis 0": "LeftJoystickX-",
+            "axis 1" : "LeftJoystickY-",
+            "-axis 1": "LeftJoystickY+",
 
-            "Axis 2" : "RightJoystickX+",
-            "-Axis 2": "RightJoystickX-",
-            "Axis 3" : "RightJoystickY-",
-            "-Axis 3": "RightJoystickY+",
+            "axis 2" : "RightJoystickX+",
+            "-axis 2": "RightJoystickX-",
+            "axis 3" : "RightJoystickY-",
+            "-axis 3": "RightJoystickY+",
 
-            "Axis 4" : "LeftTrigger+",
-            "Axis 5" : "RightTrigger+"
+            "axis 4" : "LeftTrigger+",
+            "axis 5" : "RightTrigger+"
         }
         self._monitor_thread = threading.Thread(target=run_event_loop, args=(self.added_joystick, self.removed_joystick, self.key_received))
         self._monitor_thread.daemon = True
