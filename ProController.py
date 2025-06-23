@@ -175,7 +175,6 @@ class GUI(QMainWindow):
         self.remove_action.triggered.connect(self.remove_switch)
         self.remove_action.setEnabled(False)
         
-        self.update_switch_list()
         self.refresh_timer=QTimer(self)
         self.refresh_timer.timeout.connect(self.update_switch_list)
         self.refresh_timer.start(5000)  # Refresh every 5 seconds
@@ -188,6 +187,7 @@ class GUI(QMainWindow):
 
         from typing import Tuple
         self.current_connection: Tuple[ConnectionStatus, ConnectionType] = (ConnectionStatus.DISCONNECTED, ConnectionType.UNPAIRED)  # Placeholder for current connection object
+        self.update_switch_list()
     def on_switch_selected(self, item):
         self.reconnect_action.setEnabled(True)
         self.remove_action.setEnabled(True)
