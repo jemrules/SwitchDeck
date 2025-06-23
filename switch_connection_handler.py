@@ -61,7 +61,7 @@ class test:
         if not self.controller_state:
             print("Controller is not connected")
             return
-        scalei=int(min((scale+1)/2*(0x1000),0x1000-1))
+        scalei=int(min((scale+1)/2*float(0x1000),float(0x1000)-1))
         a=None
         match stick.lower()[0]:
             case "l":
