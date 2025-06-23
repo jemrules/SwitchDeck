@@ -73,6 +73,7 @@ class test:
                 a.set_h(scalei)
             case "y":
                 a.set_v(scalei)
+        self.send_input = True
 
     async def connect_device(self, address=None):
         controller = Controller.PRO_CONTROLLER
@@ -119,7 +120,7 @@ if __name__ == "__main__":
     sleep(0.2)
     t.button_release("home")
     sleep(1)
-    t.move_stick("l","x",0.5)
+    t.move_stick("l","x",1)
     while True:
         ...
 
