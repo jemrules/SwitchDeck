@@ -81,7 +81,10 @@ class test:
             ctl_psm, itr_psm = 17, 19
             self.transport, self.protocol = await create_hid_server(self.factory,reconnect_bt_addr=address,ctl_psm=ctl_psm,itr_psm=itr_psm)
             self.controller_state = self.protocol.get_controller_state()
-        await self.controller_state.connect()
+            if not self.controller_state or not self.transport:
+                print("Failed to connect to device")
+                return
+            await self.controller_state.connect()
         print(f"Connected to device at {address}")
         self.event_queue.task_done()
     async def run(self):
