@@ -112,6 +112,7 @@ class SwitchConnectionHandler:
                         await self.protocol.get_controller_state().send()
                     except Exception as e:
                         print(f"Error sending controller state: {e}")
+                print("Input sent")
                 self.send_input = False
             if self.event_queue.empty():
                 await asyncio.sleep(0.1)
