@@ -39,15 +39,12 @@ async def btnpush(btn,controller_state):
     print(f"Pushing button: {btn}")
     controller_state.button_state.set_button(btn, True)
     print(f"Button {btn} pushed.")
-    # await controller_state.send()
-    print("Controller state sent.")
 def button_push(controller_state, btn):
     asyncio.run(btnpush(btn, controller_state))
 async def btnrelease(btn,controller_state):
     print(f"Releasing button: {btn}")
     controller_state.button_state.set_button(btn, False)
     print(f"Button {btn} released.")
-    print("Controller state sent.")
 def button_release(controller_state, btn):
     asyncio.run(btnrelease(btn, controller_state))
 async def move_stick(controller_state,stick="l",direction="x",scale=1):
@@ -120,10 +117,10 @@ class InputHandler(SteamDeckController):
             return
         print("Handling input...")
         for key, value in self.JOYCON_DIGITAL_KEYS.items():
-            print(f"Key: {key}, Value: {value}, Digital Value: {digital[key]}")
+            # print(f"Key: {key}, Value: {value}, Digital Value: {digital[key]}")
             if digital[key]>0.5:
                 button_push(GLOBAL_controller_state, value)
-                print(f"Button pushed: {key} -> {value}")
+                # print(f"Button pushed: {key} -> {value}")
             else:
                 button_release(GLOBAL_controller_state, value)
         print("Done handling input!")
