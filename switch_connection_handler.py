@@ -32,7 +32,6 @@ class test:
         self._thread.daemon = True
         self._thread.start()
     def init_variables(self):
-        self.capture_file = None
         self.factory = None
         self.transport = None
         self.protocol = None
@@ -75,7 +74,6 @@ class test:
                 a.set_v(scale)
 
     async def connect_device(self, address=None):
-        self.capture_file = utils.get_output(default=None)
         controller = Controller.PRO_CONTROLLER
         self.spi_flash = FlashMemory()
         self.factory = controller_protocol_factory(controller,spi_flash=self.spi_flash)
