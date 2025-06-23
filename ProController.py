@@ -19,7 +19,7 @@ from aioconsole import ainput
 from joycontrol import logging_default as log, utils
 from joycontrol.command_line_interface import ControllerCLI
 from joycontrol.controller import Controller
-from joycontrol.controller_state import ControllerState, button_push, button_press, button_release
+from joycontrol.controller_state import ControllerState, button_press
 from joycontrol.memory import FlashMemory
 from joycontrol.protocol import controller_protocol_factory
 from joycontrol.server import create_hid_server
@@ -35,6 +35,16 @@ async def press_btn(controller_state,btn,duration=0.1):
     await asyncio.sleep(duration)
     controller_state.button_state.set_button(btn, False)
     await controller_state.send()
+def button_push(controller_state, btn):
+    async def push():
+        controller_state.button_state.set_button(btn, True)
+        await controller_state.send()
+    asyncio.run(push())
+def button_release(controller_state, btn):
+    async def release():
+        controller_state.button_state.set_button(btn, False)
+        await controller_state.send()
+    asyncio.run(release())
 async def move_stick(controller_state,stick="l",direction="x",scale=1):
     scale=min((scale+1)/2*(0x1000),0x1000-1)
     a=None
