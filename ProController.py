@@ -84,9 +84,9 @@ def list_switches():
     return addrs
 
 class InputHandler(SteamDeckController):
-    def __init__(self, controller_state):
+    def __init__(self, parent):
         super().__init__(self.handle_input)
-        self.controller_state = controller_state
+        self.parent=parent
         self.running = True
         self.JOYCON_DIGITAL_KEYS = {
             "LeftTrigger": "zl",
@@ -113,10 +113,10 @@ class InputHandler(SteamDeckController):
         print("Handling input...")
         for key, value in self.JOYCON_DIGITAL_KEYS.items():
             if digital[key]>0.5:
-                button_push(self.controller_state, value)
+                button_push(self.parent.controller_state, value)
                 print(f"Button pushed: {key} -> {value}")
             else:
-                button_release(self.controller_state, value)
+                button_release(self.parent.controller_state, value)
 class ConnectionType(Enum):
     PAIRED = "paired"
     UNPAIRED = "unpaired"
@@ -128,6 +128,9 @@ class ConnectionStatus(Enum):
     RECONNECTING = "reconnecting"
     PAIRING = "pairing"
     ERROR = "error"
+
+# controller_state = None  # Placeholder for controller state
+# transport = None  # Placeholder for transport object
 
 class GUI(QMainWindow):
     def __init__(self):
