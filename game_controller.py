@@ -104,6 +104,5 @@ class XboxController(object):
 if __name__ == "__main__":
     controller = XboxController()
     while True:
-        print("Controller:", controller.read())
         # Add a small delay to avoid flooding the output
         time.sleep(0.1)  # Adjust the sleep time as needed
