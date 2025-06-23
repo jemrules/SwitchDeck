@@ -84,11 +84,7 @@ class test:
         if not self.controller_state or not self.transport:
             print("Failed to connect to device")
             return
-        try:
-            await self.controller_state.connect()
-        except Exception as e:
-            print(f"Error connecting to controller: {e}")
-            return
+        await self.controller_state.connect()
         print(f"Connected to device at {address}")
         self.event_queue.task_done()
     async def run(self):
