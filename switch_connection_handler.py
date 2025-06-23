@@ -131,7 +131,7 @@ class SwitchConnectionHandler:
             if self.send_input:
                 print("Sending input to controller")
                 try:
-                    await self.controller_state.send()
+                    await asyncio.wait_for(self.controller_state.send(),timeout=0.5)
                 except:
                     print(f"Controller State is {self.controller_state}")
                     try:
