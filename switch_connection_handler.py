@@ -26,13 +26,16 @@ class ConnectionStatus(Enum):
 class SwitchConnectionHandler:
     def __init__(self):
         def thread_function():
-            try:
-                asyncio.run(self.run())
-            except RuntimeError as e:
-                print(f"RuntimeError: {e}")
-            except Exception as e:
-                print(f"Exception: {e}")
-            print("Thread function completed")
+            while True:
+                try:
+                    asyncio.run(self.run())
+                except RuntimeError as e:
+                    print(f"RuntimeError: {e}")
+                except Exception as e:
+                    print(f"Exception: {e}")
+                self.status = ConnectionStatus.DISCONNECTED
+                self.init_variables()
+                print("Reinitializing connection handler")
         self.status=ConnectionStatus.DISCONNECTED
         self.init_variables()
         self.event_queue = asyncio.Queue() #type (EventType, args:list[any])
