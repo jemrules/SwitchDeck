@@ -92,7 +92,7 @@ class SteamDeckController(object):
         if key.keyname.lower().__contains__("button"):
             for key_name, key_value in self.DIGITAL_KEYS.items():
                 if key.keyname.lower() == key_name.lower():
-                    self.DIGITAL[key_name] = key.value
+                    self.DIGITAL[self.DIGITAL_KEYS[key_name]] = key.value
                     if key.value>0.5:
                         print(f"Key pressed: {key_name} ({self.DIGITAL[key_name]})")
                     break
