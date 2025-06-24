@@ -1,18 +1,33 @@
 {
-    "LeftTrigger": "zl",
-    "RightTrigger": "zr",
-    "LeftBumper": "l",
-    "RightBumper": "r",
-    "A": "a",
-    "B": "b",
-    "X": "x",
-    "Y": "y",
-    "LeftThumb": "l_stick",
-    "RightThumb": "r_stick",
-    "Back": "minus",
-    "Start": "plus",
-    "LeftDPad": "left",
-    "RightDPad": "right",
-    "UpDPad": "up",
-    "DownDPad": "down"
+    "AvailableDeckKeys":
+    [
+        "A","B","X","Y",
+        "LeftBumper","RightBumper",
+        "LeftTrigger","RightTrigger",
+        "Back","Start",
+        "LeftThumb","RightThumb",
+        "UpDPad","DownDPad","LeftDPad","RightDPad",
+        "Steam","QuickAccess",
+        "L4","L5","R4","R5"
+    ],
+    "AvailableProControllerKeys":["a","b","x","y","l","r","zl","zr","minus","plus","l_stick","r_stick","left","right","up","down"],
+
+    "keybinds": {
+        "LeftTrigger": "zl",
+        "RightTrigger": "zr",
+        "LeftBumper": "l",
+        "RightBumper": "r",
+        "A": "a",
+        "B": "b",
+        "X": "x",
+        "Y": "y",
+        "LeftThumb": "l_stick",
+        "RightThumb": "r_stick",
+        "Back": "minus",
+        "Start": "plus",
+        "LeftDPad": "left",
+        "RightDPad": "right",
+        "UpDPad": "up",
+        "DownDPad": "down"
+    }
 }
