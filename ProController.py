@@ -301,7 +301,9 @@ class GUI(QMainWindow):
         self.SWITCH_ADDRESS = self.list_of_switches.currentItem().data(Qt.UserRole) if self.list_of_switches.currentItem() else None
         def reconnecting():
             self.SwitchHandler.event_connect_device(self.SWITCH_ADDRESS)
-            while self.SwitchHandler.status == ConnectionStatus.RECONNECTING:
+            for _ in range(150):
+                if not self.SwitchHandler.status == ConnectionStatus.RECONNECTING:
+                    break
                 sleep(0.1)
             match self.SwitchHandler.status:
                 case ConnectionStatus.CONNECTED:
