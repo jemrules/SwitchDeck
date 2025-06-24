@@ -112,7 +112,8 @@ with open("keybinds.json", "r") as f:
             "LeftDPad": "left",
             "RightDPad": "right",
             "UpDPad": "up",
-            "DownDPad": "down"
+            "DownDPad": "down",
+            "QuickAccess": "home"
         }
 class InputHandler(SteamDeckController):
     def __init__(self, SwitchHandler: SwitchConnectionHandler):
