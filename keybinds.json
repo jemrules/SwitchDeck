@@ -10,7 +10,7 @@
         "Steam","QuickAccess",
         "L4","L5","R4","R5"
     ],
-    "AvailableProControllerKeys":["a","b","x","y","l","r","zl","zr","minus","plus","l_stick","r_stick","left","right","up","down"],
+    "AvailableProControllerKeys":["a","b","x","y","l","r","zl","zr","minus","plus","l_stick","r_stick","left","right","up","down","home","capture"],
 
     "keybinds": {
         "LeftTrigger": "zl",
@@ -28,6 +28,7 @@
         "LeftDPad": "left",
         "RightDPad": "right",
         "UpDPad": "up",
-        "DownDPad": "down"
+        "DownDPad": "down",
+        "Steam": "home"
     }
 }
