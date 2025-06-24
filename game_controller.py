@@ -130,6 +130,7 @@ class SteamDeckController(object):
             "axis 4" : "LeftTrigger+",
             "axis 5" : "RightTrigger+"
         }
+        self.Found=[]
         print("All joysticks:",Joystick.get_joysticks())
         self._monitor_thread = threading.Thread(target=run_event_loop, args=(self.added_joystick, self.removed_joystick, self.key_received))
         self._monitor_thread.daemon = True
@@ -159,7 +160,9 @@ class SteamDeckController(object):
                     #         print(f"Key pressed: {key_name} ({key.value})")
                     break
         elif key.keyname.lower().__contains__("axis"):
-            print(f"axis received: {key.value} ({key.keyname})")
+            if not key.keyname.lower() in self.Found:
+                self.Found.append(key.keyname.lower())
+                print(f"Found axis: {key.keyname} ({key.value})")
             for key_name, key_value in self.ANALOG_KEYS.items():
                 if key.keyname.lower() == key_name.lower():
                     self.ANALOG[key_value[:-1]] = -key.value if (key_value.endswith('-')) != (key_name.startswith("-")) else key.value
