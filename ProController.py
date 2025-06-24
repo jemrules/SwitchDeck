@@ -90,9 +90,8 @@ def list_switches():
     return addrs
 
 class InputHandler(SteamDeckController):
-    def __init__(self, SwitchHandler: SwitchConnectionHandler):
+    def __init__(self):
         super().__init__(self.handle_input)
-        self.SwitchHandler = SwitchHandler
         self.running = True
         self.JOYCON_DIGITAL_KEYS = {
             "LeftTrigger": "zl",
@@ -118,11 +117,11 @@ class InputHandler(SteamDeckController):
             return
         print("Handling input...")
         for key, value in self.JOYCON_DIGITAL_KEYS.items():
-            print(f"Key: {key}, Value: {value}, Digital Value: {self.SwitchHandler.DIGITAL[key]}")
+            print(f"Key: {key}, Value: {value}, Digital Value: {self.DIGITAL[key]}")
             if digital[key]>0.5:
-                self.SwitchHandler.button_press(value)
+                self.button_press(value)
             else:
-                self.SwitchHandler.button_release(value)
+                self.button_release(value)
         print("Done handling input!")
 class ConnectionType(Enum):
     PAIRED = "paired"
