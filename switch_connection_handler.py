@@ -63,17 +63,19 @@ class SwitchConnectionHandler:
             self.controller_state.button_state.set_button(button_name, True)
             self.send_input = True
         except:
-            print(f"Button {button_name} not found in controller state")
+            pass
+            # print(f"Button {button_name} not found in controller state")
     def button_release(self, button_name):
         # print(f"Releasing button: {button_name}")
         try:
             self.controller_state.button_state.set_button(button_name, False)
             self.send_input = True
         except:
-            print(f"Button {button_name} not found in controller state")
+            pass
+            # print(f"Button {button_name} not found in controller state")
     def move_stick(self,stick="l",direction="x",scale: float=1):
         if not self.controller_state:
-            print("Controller is not connected")
+            # print("Controller is not connected")
             return
         scalei=int(min((scale+1)/2*float(0x1000),float(0x1000)-1))
         a=None
@@ -95,20 +97,20 @@ class SwitchConnectionHandler:
         self.factory = controller_protocol_factory(controller,spi_flash=self.spi_flash)
         ctl_psm, itr_psm = 17, 19
         self.transport, self.protocol = await create_hid_server(self.factory,reconnect_bt_addr=address,ctl_psm=ctl_psm,itr_psm=itr_psm)
-        print("After create_hid_server")
+        # print("After create_hid_server")
         self.controller_state = self.protocol.get_controller_state()
-        print("after get_controller_state")
+        # print("after get_controller_state")
         if not self.controller_state or not self.transport:
-            print("Failed to connect to device")
+            # print("Failed to connect to device")
             return
         await self.controller_state.connect()
         print(f"Connected to device at {address}")
     async def run(self):
         while True:
             if self.send_input:
-                print("Sending input to controller")
+                # print("Sending input to controller")
                 await self.protocol.get_controller_state().send()
-                print("Input sent")
+                # print("Input sent")
                 self.send_input = False
             if self.event_queue.empty():
                 await asyncio.sleep(0.1)
