@@ -305,6 +305,9 @@ class GUI(QMainWindow):
                 if not self.SwitchHandler.status == ConnectionStatus.RECONNECTING:
                     break
                 sleep(0.1)
+            if self.SwitchHandler.status == ConnectionStatus.RECONNECTING:
+                self.SwitchHandler.status = ConnectionStatus.ERROR
+            print(f"Reconnection status: {self.SwitchHandler.status}")
             match self.SwitchHandler.status:
                 case ConnectionStatus.CONNECTED:
                     self.connection_indicator.setText("Reconnected!")
