@@ -12,6 +12,28 @@
     ],
     "AvailableProControllerKeys":["a","b","x","y","l","r","zl","zr","minus","plus","l_stick","r_stick","left","right","up","down","home","capture"],
 
+    "ControllerBindingsButtons":{
+        "button 0" : "",
+        "button 1" : "",
+        "button 2" : "",
+        "button 3" : "",
+        "button 4" : "",
+        "button 5" : "",
+        "button 6" : "",
+        "button 7" : "",
+        "button 8" : "",
+        "button 9" : "",
+        "button 10": "",
+        "button 11": "",
+        "button 12": "",
+        "button 13": "",
+        "button 14": "",
+        "button 15": "",
+        "button 16": "",
+        "button 17": "",
+        "button 18": "",
+        "button 19": ""
+    },
     "keybinds": {
         "LeftTrigger": "zl",
         "RightTrigger": "zr",
