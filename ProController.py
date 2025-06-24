@@ -124,9 +124,9 @@ class InputHandler(SteamDeckController):
     def handle_input(self,digital: dict,analog: dict): #* This method is called after every input loop in super _monitor_controller
         if not self.running:
             return
-        print("Handling input...")
+        # print("Handling input...")
         for key, value in self.JOYCON_DIGITAL_KEYS.items():
-            print(f"Key: {key}, Value: {value}, Digital Value: {self.DIGITAL[key]}")
+            # print(f"Key: {key}, Value: {value}, Digital Value: {self.DIGITAL[key]}")
             if digital[key]>0.5:
                 self.SwitchHandler.button_press(value)
             else:
@@ -135,7 +135,7 @@ class InputHandler(SteamDeckController):
         self.SwitchHandler.move_stick("l","y",self.ANALOG["LeftJoystickY"])
         self.SwitchHandler.move_stick("r","x",self.ANALOG["RightJoystickX"])
         self.SwitchHandler.move_stick("r","y",self.ANALOG["RightJoystickY"])
-        print("Done handling input!")
+        # print("Done handling input!")
 class ConnectionType(Enum):
     PAIRED = "paired"
     UNPAIRED = "unpaired"
