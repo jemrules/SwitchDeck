@@ -1,4 +1,4 @@
-from pyjoystick.sdl2 import Key, Joystick, run_event_loop, 
+from pyjoystick.sdl2 import Key, Joystick, run_event_loop
 import math
 import time
 import threading
