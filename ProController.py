@@ -93,7 +93,7 @@ def list_switches():
 PROCONTROLLER_KEYBINDS = {}
 with open("keybinds.json", "r") as f:
     try:
-        PROCONTROLLER_KEYBINDS = json.load(f)
+        PROCONTROLLER_KEYBINDS = json.load(f)["keybinds"]
     except json.JSONDecodeError as e:
         logging.error(f"Failed to load keybinds.json: {e}")
         PROCONTROLLER_KEYBINDS={
