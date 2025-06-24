@@ -167,6 +167,8 @@ class SteamDeckController(object):
                 if key.keyname.lower() == key_name.lower():
                     self.ANALOG[key_value[:-1]] = -key.value if (key_value.endswith('-')) != (key_name.startswith("-")) else key.value
                     break
+        else:
+            print(f"Key received: {key.value} ({key.keyname}) - Ignored")
         self.DIGITAL['LeftTrigger']  = 1 if self.ANALOG['LeftTrigger'] > 0.25 else 0
         self.DIGITAL['RightTrigger'] = 1 if self.ANALOG['RightTrigger'] > 0.25 else 0
         self.update(self.function)
