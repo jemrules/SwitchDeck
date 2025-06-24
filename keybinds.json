@@ -1,0 +1,18 @@
+{
+    "LeftTrigger": "zl",
+    "RightTrigger": "zr",
+    "LeftBumper": "l",
+    "RightBumper": "r",
+    "A": "a",
+    "B": "b",
+    "X": "x",
+    "Y": "y",
+    "LeftThumb": "l_stick",
+    "RightThumb": "r_stick",
+    "Back": "minus",
+    "Start": "plus",
+    "LeftDPad": "left",
+    "RightDPad": "right",
+    "UpDPad": "up",
+    "DownDPad": "down"
+}

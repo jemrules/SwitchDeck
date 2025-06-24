@@ -7,6 +7,7 @@ import threading
 import argparse
 import asyncio
 import logging
+import json
 import sys
 import os
 import re
@@ -89,12 +90,13 @@ def list_switches():
     addrs=[re.findall(r"(((([0-9A-Z]{2}):){5})[0-9A-Z][0-9A-Z])",x)[0][0] for x in addrs if x.lower().__contains__("nintendo")]
     return addrs
 
-class InputHandler(SteamDeckController):
-    def __init__(self, SwitchHandler: SwitchConnectionHandler):
-        super().__init__(self.handle_input)
-        self.SwitchHandler = SwitchHandler
-        self.running = True
-        self.JOYCON_DIGITAL_KEYS = {
+PROCONTROLLER_KEYBINDS = {}
+with open("keybinds.json", "r") as f:
+    try:
+        PROCONTROLLER_KEYBINDS = json.load(f)
+    except json.JSONDecodeError as e:
+        logging.error(f"Failed to load keybinds.json: {e}")
+        PROCONTROLLER_KEYBINDS={
             "LeftTrigger": "zl",
             "RightTrigger": "zr",
             "LeftBumper": "l",
@@ -112,6 +114,12 @@ class InputHandler(SteamDeckController):
             "UpDPad": "up",
             "DownDPad": "down"
         }
+class InputHandler(SteamDeckController):
+    def __init__(self, SwitchHandler: SwitchConnectionHandler):
+        super().__init__(self.handle_input)
+        self.SwitchHandler = SwitchHandler
+        self.running = True
+        self.JOYCON_DIGITAL_KEYS = PROCONTROLLER_KEYBINDS
     
     def handle_input(self,digital: dict,analog: dict): #* This method is called after every input loop in super _monitor_controller
         if not self.running:
