@@ -123,6 +123,10 @@ class InputHandler(SteamDeckController):
                 self.SwitchHandler.button_press(value)
             else:
                 self.SwitchHandler.button_release(value)
+        self.SwitchHandler.move_stick("l","x",self.ANALOG["LeftJoystickX"])
+        self.SwitchHandler.move_stick("l","y",self.ANALOG["LeftJoystickY"])
+        self.SwitchHandler.move_stick("r","x",self.ANALOG["RightJoystickX"])
+        self.SwitchHandler.move_stick("r","y",self.ANALOG["RightJoystickY"])
         print("Done handling input!")
 class ConnectionType(Enum):
     PAIRED = "paired"
